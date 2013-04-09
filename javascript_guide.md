@@ -18,7 +18,7 @@
     * [Aptana Studio 2](http://www.aptana.com/products/studio2)
     * [Notepad++](http://notepad-plus-plus.org/)
     * [Vim](http://www.vim.org/)
-1. Synatx Checker
+1. Syntax Checker
     * [jsLint](http://www.jslint.com/)
     * [jsHint](http://www.jshint.com/)
     * [JavaScriptLint](http://www.javascriptlint.com/)
