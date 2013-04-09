@@ -56,7 +56,7 @@ build
   |-- main.css
   |-- img
 ```
-1. #include in js -> JavaScript 的模块化管理
+1. `#include` in js -> JavaScript 的模块化管理
     * seajs library
     * requireJS
     * AMD
