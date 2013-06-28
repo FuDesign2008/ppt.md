@@ -69,7 +69,8 @@
 1. [jq](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-jq)
 1. [mvc](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-mvc)
 1. 依赖关系
-```
+
+```text
 [-- web --] [-- jq --] [-- mvc --]
 [------------ core --------------]
 ```
