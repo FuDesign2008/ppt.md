@@ -37,7 +37,16 @@
 1. 编辑器开发中遇到的问题
     * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified. ![domsubtreemodified.png](./img/domsubtreemodified.png 'DOMSubtreeModified')
     * jquery 对DocumentFragment不能良好操作. ![docfragment.png](./img/docfragment.png 'DocumentFragment')
-    * querySelector(), querySelectorAll() 不能支持复杂选择器, e.g. `querySelector('[src=http://xxxxx]')`.  ![query.png](./img/query.png 'query error')
+    * querySelector(), querySelectorAll() 不能支持复杂选择器
+```javascript
+...
+innerSelector = '[data-todo-id=' + todoId + ']';
+//此时，innerSelector比较复杂
+//使用原生的querySelector， 会出现DOMException
+//tempEl = article.querySelector(innerSelector);
+tempEl = $(innerSelector, article).get(0);
+...
+```
 
 ###如何解决?
 要满足以上需求, 需要做以下工作
