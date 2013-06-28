@@ -36,6 +36,8 @@
 1. WebClipper输入内容系统过滤
 1. 编辑器开发中遇到的问题
     * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified.
+    * jquery 对DocumentFragment不能良好操作.
+    * querySelector(), querySelectorAll() 不能支持复杂选择器
 
 ```javascript
 ...
@@ -49,7 +51,6 @@ var setHandwrites = function () {
 ...
 ```
 
-    * jquery 对DocumentFragment不能良好操作.
 
 ```javascript
 ...
@@ -61,7 +62,6 @@ filter: function (next, area) {
 ...
 ```
 
-    * querySelector(), querySelectorAll() 不能支持复杂选择器
 
 ```javascript
 ...
