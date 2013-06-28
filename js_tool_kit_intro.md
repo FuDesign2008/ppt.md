@@ -38,6 +38,7 @@
     * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified. ![domsubtreemodified.png](./img/domsubtreemodified.png 'DOMSubtreeModified')
     * jquery 对DocumentFragment不能良好操作. ![docfragment.png](./img/docfragment.png 'DocumentFragment')
     * querySelector(), querySelectorAll() 不能支持复杂选择器
+
 ```javascript
 ...
 innerSelector = '[data-todo-id=' + todoId + ']';
