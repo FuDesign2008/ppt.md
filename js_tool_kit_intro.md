@@ -35,9 +35,9 @@
     * bugs
 1. WebClipper输入内容系统过滤
 1. 编辑器开发中遇到的问题
-    * jquery黑盒, e.g. $('selector', article) 触发DOMSubTreeModify
-    * jquery 对DocumentFragment不能良好操作
-    * querySelector(), querySelectorAll() 不能支持复杂选择器, e.g. querySelector('[src=http://xxxxx]')
+    * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified. ![domsubtreemodified.png](./img/domsubtreemodified.png 'DOMSubtreeModified')
+    * jquery 对DocumentFragment不能良好操作. ![docfragment.png](./img/docfragment.png 'DocumentFragment')
+    * querySelector(), querySelectorAll() 不能支持复杂选择器, e.g. `querySelector('[src=http://xxxxx]')`
 
 ###如何解决?
 要满足以上需求, 需要做以下工作
@@ -112,6 +112,7 @@
 
 ###自动化
 1. [gruntjs](http://gruntjs.com/) 打包
+    * [getting started](http://gruntjs.com/getting-started)
 1. [QUnit](http://qunitjs.com/) 单元测试
     * [JSToolKit-core QUnit](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-core/trunk/test/jstoolkit_core.html)
     * [JSToolKit-web QUnit](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-web/trunk/test/jstoolkit_web.html)
@@ -178,6 +179,13 @@ QUnit.test('web/dom/query', function () {
 
 ##感想
 1. 自动化单元测试很重要
+
+
+##Next
+1. 扩展与增强
+1. 性能测试与优化
+1. 完善打包流程
+
 
 
 
