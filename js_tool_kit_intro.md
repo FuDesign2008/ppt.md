@@ -35,8 +35,32 @@
     * bugs
 1. WebClipper输入内容系统过滤
 1. 编辑器开发中遇到的问题
-    * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified. ![domsubtreemodified.png](./img/domsubtreemodified.png 'DOMSubtreeModified')
-    * jquery 对DocumentFragment不能良好操作. ![docfragment.png](./img/docfragment.png 'DocumentFragment')
+    * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified.
+
+```javascript
+...
+var setHandwrites = function () {
+    // 会触发DOMSubtreeModified 事件
+    handwrites = $(selector, article).toArray();
+    //
+    if (!handwrites.length) {
+        return;
+    }
+...
+```
+
+    * jquery 对DocumentFragment不能良好操作.
+
+```javascript
+...
+filter: function (next, area) {
+    //area 是DocumentFragment, 所以使用jQuery(ITEM, area)会有问题
+    //（但在area的子元素中使用jQuery是OK的）
+    var todos = area.querySelectorAll(ITEM),
+        unwanted = ['container', ''];
+...
+```
+
     * querySelector(), querySelectorAll() 不能支持复杂选择器
 
 ```javascript
