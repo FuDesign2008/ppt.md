@@ -41,6 +41,7 @@
 
 ###如何解决?
 要满足以上需求, 需要做以下工作
+
 1. htmlParse.js 作为独立工程
     * 编辑器输入输出系统过滤
     * WebClipper输入系统过滤
@@ -101,7 +102,7 @@
     * insert, insertHTML....
 1. bom
     * userAgent
-1. event: DOM事件处理相关
+1. event: DOM 事件
 1. ani: 动画
 1. 兼容IE6+, Chrome, Firefox, Opera
     * 与jQuery 1.x 保持一致, see http://jquery.com/browser-support/
@@ -110,8 +111,61 @@
 1. jquery/backbone 封装
 
 ###自动化
-1. gruntjs 打包
-1. QUnit 单元测试
+1. [gruntjs](http://gruntjs.com/) 打包
+1. [QUnit](http://qunitjs.com/) 单元测试
+    * [JSToolKit-core QUnit](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-core/trunk/test/jstoolkit_core.html)
+    * [JSToolKit-web QUnit](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-web/trunk/test/jstoolkit_web.html)
+
+```javascript
+QUnit.test('web/dom/query', function () {
+    var query = require('../src/web/dom/query'),
+        div = document.createElement('div'),
+        html = '<div>' +
+                '<p id="first_p">' +
+                '<span data-hello="hel">hello, world</span>' +
+                '</p>' +
+                '<p class="hello">' +
+                '<font>font name</font>' +
+                '</p>' +
+                '<span class="hello"></span>' +
+                '</div>';
+
+    div.innerHTML = html;
+    QUnit.equal(query.one('div', div),
+        div.getElementsByTagName('div')[0], 'one() div ok');
+
+    QUnit.equal(query.one('#first_p', div),
+        div.getElementsByTagName('p')[0], 'one() #first_p ok');
+
+    QUnit.equal(query.one('.hello', div),
+        div.getElementsByTagName('p')[1], 'one() .hello ok');
+
+    QUnit.equal(query.one('span.hello', div),
+        div.getElementsByTagName('span', div)[1], 'span.hello ok');
+
+    QUnit.equal(query.one('span[data-hello=hello]', div), null,
+            'span[data-hello=hello] ok');
+
+    QUnit.equal(query.one('span[data-hello=hel]', div),
+        div.getElementsByTagName('span')[0],
+        'one() span[data-hello=hel] ok');
+
+    QUnit.equal(query.one('font', div),
+            div.getElementsByTagName('font')[0], 'one() font ok');
+    //
+    QUnit.equal(query.all('font', div).length,
+            div.getElementsByTagName('font').length, 'all() font ok');
+
+    QUnit.equal(query.all('.hello', div).length, 2, 'all() .hello ok');
+
+    QUnit.equal(query.all('i', div).length, 0, 'all() i ok');
+
+    QUnit.equal(query.all('span', div).length, 2, 'all() span ok');
+
+    QUnit.equal(query.all('span[data-hello]', div).length, 1,
+            'all() span[data-hello] ok');
+});
+```
 
 ##应用
 1. Editor重构(core + web + jq + mvc)
