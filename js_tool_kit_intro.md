@@ -4,23 +4,10 @@
 ##主要内容
 1. JSToolKit是什么
 1. 需求及产生过程
-    * 原始出发点
-    * 如何解决?
-    * 重构
 1. 特点
-    * 模块化
-    * 分层
-    * core
-    * web
-    * jq
-    * mvc
-    * 自动化
 1. 应用
-    * Editor
-    * htmlParser.js
-    * 组合使用
 1. 感想
-    * 自动化单元测试很重要
+1. NEXT
 
 ##JSToolKit是什么
 一个高度分层的js工具库, 强通用性和高扩展性
@@ -38,6 +25,7 @@
     * jquery黑盒, e.g. $('selector', article) 触发DOMSubtreeModified.
     * jquery 对DocumentFragment不能良好操作.
     * querySelector(), querySelectorAll() 不能支持复杂选择器
+    * ...
 
 ```javascript
 ...
@@ -91,9 +79,10 @@ tempEl = $(innerSelector, article).get(0);
     * 修复原始某些api bug
 
 ###重构
-1. 要完成以上工作以满足需求, 编辑器改动非常大
-1. 尽可能复用已有的编辑器模块, 比如PC端的编辑器按钮拦
-1. 无底层基础库支持, 重构痛苦
+1. 要完成以上工作以满足需求, 编辑器改动非常大, 得重构
+1. 重构时, 尽可能复用已有的编辑器模块, 比如PC端的编辑器按钮拦
+1. 无底层基础库支持, 编辑器重构痛苦
+1. htmlParse.js 不适合用jquery操作dom
 
 ##JSToolKit特点
 
@@ -152,53 +141,19 @@ tempEl = $(innerSelector, article).get(0);
     * [JSToolKit-web QUnit](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-web/trunk/test/jstoolkit_web.html)
 
 ```javascript
-QUnit.test('web/dom/query', function () {
-    var query = require('../src/web/dom/query'),
+QUnit.test('web/dom/insert', function () {
+    var insert = require('../src/web/dom/insert'),
         div = document.createElement('div'),
-        html = '<div>' +
-                '<p id="first_p">' +
-                '<span data-hello="hel">hello, world</span>' +
-                '</p>' +
-                '<p class="hello">' +
-                '<font>font name</font>' +
-                '</p>' +
-                '<span class="hello"></span>' +
-                '</div>';
-
-    div.innerHTML = html;
-    QUnit.equal(query.one('div', div),
-        div.getElementsByTagName('div')[0], 'one() div ok');
-
-    QUnit.equal(query.one('#first_p', div),
-        div.getElementsByTagName('p')[0], 'one() #first_p ok');
-
-    QUnit.equal(query.one('.hello', div),
-        div.getElementsByTagName('p')[1], 'one() .hello ok');
-
-    QUnit.equal(query.one('span.hello', div),
-        div.getElementsByTagName('span', div)[1], 'span.hello ok');
-
-    QUnit.equal(query.one('span[data-hello=hello]', div), null,
-            'span[data-hello=hello] ok');
-
-    QUnit.equal(query.one('span[data-hello=hel]', div),
-        div.getElementsByTagName('span')[0],
-        'one() span[data-hello=hel] ok');
-
-    QUnit.equal(query.one('font', div),
-            div.getElementsByTagName('font')[0], 'one() font ok');
-    //
-    QUnit.equal(query.all('font', div).length,
-            div.getElementsByTagName('font').length, 'all() font ok');
-
-    QUnit.equal(query.all('.hello', div).length, 2, 'all() .hello ok');
-
-    QUnit.equal(query.all('i', div).length, 0, 'all() i ok');
-
-    QUnit.equal(query.all('span', div).length, 2, 'all() span ok');
-
-    QUnit.equal(query.all('span[data-hello]', div).length, 1,
-            'all() span[data-hello] ok');
+        strong = document.createElement('strong'),
+        b = document.createElement('b'),
+        span;
+    div.innerHTML = '<p>hello<span>world and javascript</span></p>';
+    span = div.getElementsByTagName('span')[0];
+    insert(strong).after(span);
+    QUnit.equal(span.nextSibling, strong);
+    insert(b).before(span);
+    QUnit.equal(span.previousSibling, b);
+    console.log(div);
 });
 ```
 
@@ -215,10 +170,11 @@ QUnit.test('web/dom/query', function () {
 1. 自动化单元测试很重要
 
 
-##Next
+##NEXT
 1. 扩展与增强
 1. 性能测试与优化
 1. 完善打包流程
+
 
 
 
