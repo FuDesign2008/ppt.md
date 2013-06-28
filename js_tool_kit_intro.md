@@ -22,7 +22,7 @@
 1. 感想
     * 自动化单元测试很重要
 
-###JSToolKit是什么
+##JSToolKit是什么
 一个高度分层的js工具库, 强通用性和高扩展性
 
 ###需求及产生过程
@@ -60,9 +60,9 @@
 1. 尽可能复用已有的编辑器模块, 比如PC端的编辑器按钮拦
 1. 无底层基础库支持, 重构痛苦
 
-###JSToolKit特点
+##JSToolKit特点
 
-####高度分层
+###高度分层
 1. 模块化 -> seajs
 1. [core](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-core)
 1. [web](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JSToolKit-web)
@@ -74,7 +74,7 @@
 [------------ core --------------]
 ```
 
-####core
+###core
 1. underscore.js
 1. string 常用处理
     * 借鉴[underscore.string](http://epeli.github.io/underscore.string/)
@@ -94,7 +94,7 @@
 1. 强通用性
     * 与DOM无关
 
-####web
+###web
 1. dom: DOM 操作
     * query.one()/query.all() 替代 querySelector(), querySelectorAll(), 并增强
     * insert, insertHTML....
@@ -105,21 +105,21 @@
 1. 兼容IE6+, Chrome, Firefox, Opera
     * 与jQuery 1.x 保持一致, see http://jquery.com/browser-support/
 
-####jq/mvc
+###jq/mvc
 1. jquery/backbone 封装
 
-####自动化
+###自动化
 1. gruntjs 打包
 1. QUnit 单元测试
 
 ##应用
-1. Editor重构
-1. htmlParser.js
+1. Editor重构(core + web + jq + mvc)
+1. htmlParser.js (core + web)
 1. 高度分层便于组合使用
-    * core
-    * core + web
-    * core + jq
-    * core + jq + mvc
+    * core ->  无DOM操作相关项目
+    * core + web -> DOM操作相关项目
+    * core + jq -> DOM操作相关项目
+    * core + jq + mvc -> 单页面app项目
 
 ##感想
 1. 自动化单元测试很重要
