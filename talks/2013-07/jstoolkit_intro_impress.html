@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=1024">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>htmlParser.js intro</title>
+    <link href="../../impress/css/impress-demo.css" rel="stylesheet" />
+    <link href="../../css/impress.md.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="../../impress/favicon.png" />
+    <link rel="apple-touch-icon" href="../../impress/apple-touch-icon.png" />
+</head>
+<body class="impress-not-supported">
+
+<div class="fallback-message">
+    <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented with a simplified version of this presentation.</p>
+    <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+</div>
+<div id="impress">
+</div>
+<div class="hint">
+    <p>Use a spacebar or arrow keys to navigate</p>
+</div>
+<script>
+if ("ontouchstart" in document.documentElement) {
+    document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
+}
+</script>
+<script type="text/html" id="ppt_item_tmpl">
+    <div id="<%=id%>" class="step" data-x="<%=x%>" data-y="<%=y%>" data-rotate="<%=rotate%>" data-scale="<%=scale%>"><%=content%></div>
+</script>
+
+<!-- configs -->
+<script>
+    window.PPT_CONFIG = {
+        // the file path of markdown file
+        mdPath: 'jstoolkit_intro.md'
+    }
+</script>
+<!-- tools for make html -->
+<script src="../../deck/jquery-1.7.2.min.js"></script>
+<script src="../../impress/js/impress.js"></script>
+<script type="text/javascript" src="../../js/showdown-min.js"></script>
+<script type="text/javascript" src="../../js/micro-tmpl.js"></script>
+<script type="text/javascript" src="../../js/impress.md.js"></script>
+</body>
+</html>

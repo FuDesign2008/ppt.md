@@ -1,0 +1,54 @@
+.step {
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+}
+.step {
+    /*background: #FCFCFC;*/
+    /*opacity: 0.7 !important;*/
+}
+.step h1 {
+    font-size: 200%;
+    text-align: center;
+}
+.step h2 {
+    font-size: 150%;
+}
+.step pre {
+  border-color: #cde;
+  background: #F0F0F0;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  font-size: 21px;
+  margin-top: 15px;
+}
+.step h1 {
+
+}
+.step ul,
+.step ul li{
+    list-style: disc outside;
+    font-size: 27px;
+}
+.step ol,
+.step ol li {
+    list-style: decimal outside;
+    font-size: 27px;
+}
+
+
+.step ul ul,
+.step ol ul,
+.step ul ul li,
+.step ol ul li {
+    list-style: circle inside;
+    font-size: 21px;
+
+}
+
+.step ul ol,
+.step ol ol,
+.step ul ol li,
+.step ol ol li {
+    list-style: decimal inside;
+    font-size: 21px;
+}
