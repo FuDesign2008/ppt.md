@@ -1,13 +1,13 @@
 Talks List
 ===========
-http://fudesign2008.github.io/talks/
+http://fudesign2008.github.io/ppt.md/
 
 
 ##How to write ppt with markdown file ?
 
 1. Write markdown file and use `=====` to split content as ppt pages, then save the file.
-1. Copy `talks/2013-07/html_parser_intro.html` and save the file with the name what you want.
-1. Find `PPT_CONFIG` and change it.
+1. Copy `talks/2013-07/html_parser_intro_deck.html` (deck style) or `talks/2013-07/html_parser_intro_impress.html`(impress style) and save the file with the name what you want.
+1. Find `PPT_CONFIG` in html file and change it.
 
 ```html
 <script>
@@ -24,12 +24,15 @@ http://fudesign2008.github.io/talks/
 * use `<pre>` tag for code
 
 ##Examples
- * http://fudesign2008.github.io/talks/talks/2013-07/jstoolkit_intro.html
- * http://fudesign2008.github.io/talks/talks/2013-07/html_parser_intro.html
+ * http://fudesign2008.github.io/ppt.md/talks/2013-07/jstoolkit_intro_deck.html
+ * http://fudesign2008.github.io/ppt.md/talks/2013-07/html_parser_intro_deck.html
+ * http://fudesign2008.github.io/ppt.md/talks/2013-07/jstoolkit_intro_impress.html
+ * http://fudesign2008.github.io/ppt.md/talks/2013-07/html_parser_intro_impress.html
+
 
 
 ##Next
- * 整合 impress.js
+ * 整合 impress.js [done]
  * 整合 bespoke.js
 
 
