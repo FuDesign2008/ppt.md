@@ -1,4 +1,4 @@
-#JSToolKit 介绍
+#JSToolKit 框架介绍
 
 =====
 ##主要内容
