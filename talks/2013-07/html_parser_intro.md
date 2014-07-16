@@ -28,7 +28,7 @@
 =====
 ##Why htmlParser.js
 * 内容未系统过滤
-<pre>
+<pre><code class="language-html">
     普通网页
 
     &lt;div style="float:right"&gt;xxx...&lt;/div&gt;    &lt;= 影响布局
@@ -42,7 +42,7 @@
     mso-char-indent-count:0;           <= mso-
     mso-list:l2 level1 lfo4;           <= mso-
     ...
-</pre>
+</code></pre>
 =====
 ##Why htmlParser.js
 * 不合理的内容影响编辑器对内容处理和用户的编辑体验
@@ -74,30 +74,30 @@
 </pre>
 =====
 ##Q: 如何实现?
-<pre>
+<pre><code class="language-javascript">
     var html = "&lt;div&gt;&lt;/div&gt;",
         result;
 
     //移除div标签
     result === '';
-</pre>
+</code></pre>
 
-<pre>
+<pre><code class="language-javascript">
     //保留div标签
     result === "&lt;div&gt;&lt;/div&gt;";
-</pre>
+</code></pre>
 
-<pre>
+<pre><code class="language-javascript">
     //重命名div -> p
     result === "&lt;p&gt;&lt;/p&gt;";
 
-</pre>
+</code></pre>
 =====
 ##规则: style
 * 移除
 * 保留
 * 重命名
-<pre>
+<pre><code class="language-html">
     style="font-size: 100px; font-weight: bold; mso-font-family: 宋体;"
 
     1. 移除fontSize
@@ -105,10 +105,10 @@
     3. 重命名mso-font-family -> font-family
 
     style="font-weight: bold; font-family: 宋体;"
-</pre>
+</code></pre>
 =====
 ##Q: 如何实现?
-<pre>
+<pre><code class="language-javascript">
     var html = '&lt;div style="font-size: 100px; font-weight: bold; mso-font-family: 宋体;" &gt;' +
         '&lt;/div&gt;',
         result;
@@ -119,7 +119,7 @@
     //4. div --> p
 
     result = '&lt;p style="font-weight: bold; font-family: 宋体;" &gt;&lt;/p&gt;'
-</pre>
+</code></pre>
 =====
 ##Tricks
 1. only inline style
@@ -134,7 +134,7 @@
 * 移除
 * 保留
 * 重命名
-<pre>
+<pre><code class="language-html">
     class="float-right ynote-todo-div ynote-todo-hover"
 
     1. 移除float-right
@@ -142,10 +142,10 @@
     3. 重命名ynote-todo-div -> ynote-todo-container
 
     class="ynote-todo-container ynote-todo-hover"
-</pre>
+</code></pre>
 =====
 ##Q: 如何实现?
-<pre>
+<pre><code class="language-javascript">
     var html = '&lt;div class="float-right ynote-todo-div ynote-todo-hover" &gt;&lt/div&gt'
         result;
 
@@ -154,13 +154,13 @@
     //3. 重命名ynote-todo-div -> ynote-todo-container
 
     result === '&lt;div class="ynote-todo-container ynote-todo-hover" &gt;&lt;/div&gt;';
-</pre>
+</code></pre>
 =====
 ##规则: attribute
 * 移除
 * 保留
 * 重命名
-<pre>
+<pre><code class="language-html">
     hello="world" href="http://www.youdao.com/" id="123"
 
     1. 移除hello
@@ -168,10 +168,10 @@
     3. 重命名id -> data-id
 
     href="http://www.youdao.com/" data-id="123"
-</pre>
+</code></pre>
 =====
 ##Q: 如何实现?
-<pre>
+<pre><code class="language-javascript">
     var html = '&lt;div hello="world" href="http://www.youdao.com/" id="123" &gt;&lt;/div&gt;',
         result;
 
@@ -180,7 +180,7 @@
     //3. 重命名id -> data-id
 
     result === '&lt;div href="http://www.youdao.com/" data-id="123" &gt;&lt;/div&gt;'
-</pre>
+</code></pre>
 =====
 ##总结
 1. html -> DOM tree

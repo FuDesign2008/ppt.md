@@ -1,8 +1,7 @@
 (function () {
     var TMPL = window.tmpl,
         $ = window.jQuery,
-        Showdown = window.Showdown,
-        MAKE_HTML = (new Showdown.converter()).makeHtml,
+        marked = window.marked,
         PPT_CONFIG = window.PPT_CONFIG,
         SPLITER = '=====',
         mdPath,
@@ -12,7 +11,7 @@
          * @return {String}
          */
         sectionHtml = function (content) {
-            content = MAKE_HTML(content);
+            content = marked(content);
             return TMPL(tmplId, {
                 content: content
             });
@@ -40,15 +39,35 @@
     $(function () {
         window.console.log('ajax to get markdown file: ' + mdPath + '...');
         $.get(mdPath, function (data) {
-            window.console.log('ajax complete');
-            var contents = data.split(SPLITER);
+            //window.console.log('ajax complete');
+            var contents = data.split(SPLITER),
+                slideSelector = PPT_CONFIG.slideSelector || 'li, img, pre';
             //window.console.log(contents);
             contents = pptHtml(contents);
-            window.console.log(contents);
+            //window.console.log(contents);
             $(contents).insertBefore(document.body.firstChild);
-            $('li, img, pre', document.body).addClass('slide');
+            //$('li, img, pre', document.body).addClass('slide');
+            $(slideSelector, document.body).each(function (index, el) {
+                var slide = el.getAttribute('data-md-slide');
+                if (slide !== 'no') {
+                    $(el).addClass('slide');
+                }
+            });
             // initialize ppt
             $.deck('.slide');
+
+            if (window.Prism) {
+                $('pre', document.body).each(function (index, pre) {
+                    var code = $('>code', pre).get(0);
+                    if (!code) {
+                        return;
+                    }
+                    if (code.className.indexOf('language') > -1) {
+                        window.Prism.highlightElement(code);
+                    }
+                });
+
+            }
         }, 'text');
     });
 })();
