@@ -1,0 +1,431 @@
+#`this` in JavaScript
+
+=====
+
+#`this` ?
+
+=====
+
+
+#定义处上下文对象
+
+=====
+
+#不同情景
+
+=====
+
+##纯函数
+
+<pre data-md-slide="no"><code class="language-javascript">
+var test = function (value) {
+    this.hello = value;
+    console.log('this in test() ')
+    console.log(this);
+    console.log(window.hello);
+};
+
+test('value from window');
+
+</code></pre>
+
+=====
+
+##纯函数
+
+<pre data-md-slide="no"><code class="language-javascript">
+var wrapper = function (value) {
+    console.log('this in wrapper() ');
+    console.log(this);
+    test(value || 'value from wrapper');
+};
+
+wrapper();
+</code></pre>
+
+<pre><code class="language-javascript">
+var obj = {};
+wrapper.call(obj, 'value from wrapper apply');
+
+</code></pre>
+
+=====
+##对象方法
+
+<pre data-md-slide="no"><code class="language-javascript">
+window._name = 'window';
+
+var uncleWang = {
+    _name: 'WangXiaobo',
+    getName: function () {
+        return this._name;
+    },
+    displayName: function () {
+        var name = this.getName();
+        console.log('The name is ' + name);
+    }
+};
+
+uncleWang.displayName();
+
+</code></pre>
+=====
+
+##对象方法
+<pre data-md-slide="no"><code class="language-javascript">
+window._name = 'window';
+var sayName = function () {
+    console.log('My name is ' + this._name);
+}
+sayName();
+
+</code></pre>
+
+<pre><code class="language-javascript">
+uncleWang.sayName = sayName;
+
+uncleWang.sayName();
+
+</code></pre>
+
+<pre><code class="language-javascript">
+sayName();
+</code></pre>
+=====
+
+##类构造函数/类实例方法
+
+<pre data-md-slide="no"><code class="language-javascript">
+function Person (name) {
+    this._name = name;
+}
+Person.prototype.getName = function () {
+    return this._name;
+};
+Person.prototype.displayName = function () {
+    var name = this.getName();
+    console.log('name: ' + name);
+};
+
+var uncleWang = new Person('WangXiaobo');
+uncleWang.displayName();
+
+</code></pre>
+
+=====
+
+##类方法
+<pre data-md-slide="no"><code class="language-javascript">
+Person._className = 'Person';
+Person.getNameOfClass = function () {
+    return this._className;
+};
+
+console.log('name of class: ' + Person.getNameOfClass());
+
+</code></pre>
+
+=====
+
+#call/apply/bind
+
+=====
+
+##call/apply/bind
+
+1. 在函数中, `this`指向这些方法绑定的对象
+1. 如果绑定的对象是`undefined`或者`null`, `this`指向全局上下文.
+
+<pre><code class="language-javascript">
+
+var test = function (value) {
+    console.log(this.hello);
+};
+
+test.call(null);
+
+uncleWang.displayName.call(null);
+
+</code></pre>
+
+=====
+##call/apply/bind
+<pre data-md-slide="no"><code class="language-javascript">
+window.hello = 'hello of window';
+var obj = {
+    hello: 'hello of obj'
+};
+var sayHello = function () {
+    console.log(this.hello);
+};
+
+sayHello();
+
+</code></pre>
+
+<pre><code class="language-javascript">
+sayHello.call(obj);
+sayHello.apply(obj);
+
+var bindedSayHello = sayHello.bind(obj);
+bindedSayHello();
+
+</code></pre>
+=====
+##call/apply/bind
+
+<pre data-md-slide="no"><code class="language-javascript">
+var obj = {
+    hello: 'hello of obj'
+};
+var sayHello = function () {
+    console.log(this.hello);
+};
+var bindedSayHello = sayHello.bind(obj);
+var obj2 = {
+    hello: 'hello of obj2'
+};
+bindedSayHello.call(obj2);
+
+</code></pre>
+
+=====
+##bind
+<pre data-md-slide="no"><code class="language-javascript">
+/**
+ * @param {Function} fn
+ * @param {Object} context
+ * @return {Function}
+ */
+var bind = function (fn, context) {
+    return function () {
+        fn.apply(context, arguments);
+    };
+}
+var bindedSayHello2 = bind(sayHello, obj);
+bindedSayHello2();
+
+</code></pre>
+=====
+
+##事件监听器
+
+1. 行内绑定
+1. DOM Level 0 方式绑定
+1. DOM Level 2 方式绑定
+1. IE
+
+=====
+
+##行内绑定
+
+<pre data-md-slide="no"><code class="language-markup">
+    &lt;a onclick="alert('link')" &gt; This is a link &lt;/a&gt;
+
+</code></pre>
+
+<pre><code class="language-markup">
+    &lt;a onclick="alert(this)" &gt; This is a link &lt;/a&gt;
+
+</code></pre>
+=====
+
+##行内绑定
+<pre data-md-slide="no"><code class="language-javascript">
+    window.innerHTML = "innerHTML of window";
+    var showMsg = function () {
+        console.log(this.innerHTML);
+    };
+
+</code></pre>
+<pre data-md-slide="no"><code class="language-markup">
+    &lt;a onclick="showMsg()" &gt; This is a link &lt;/a&gt;
+
+</code></pre>
+
+=====
+##DOM Level 0
+
+<pre data-md-slide="no"><code class="language-javascript">
+    var link = document.querySelector('a');
+
+    link.onclick = function () {
+        console.log(this);
+    };
+
+</code></pre>
+
+=====
+##DOM Level 2
+
+<pre data-md-slide="no"><code class="language-javascript">
+    var link = document.querySelector('a');
+
+    link.addEventListener('click', function () {
+        console.log(this);
+    }, false);
+
+</code></pre>
+
+=====
+##IE
+
+<pre data-md-slide="no"><code class="language-javascript">
+    var link = document.querySelector('a');
+
+    link.attachEvent('onclick', function () {
+        console.log(this);
+    });
+
+    // IE9+
+    link.addEventListener('click', function () {
+        console.log(this);
+    }, false);
+
+</code></pre>
+
+=====
+
+##测试
+
+* `Element` : `this` 指向被绑定的元素
+* `Window` : `this`指向`window`对象
+* `X` : 浏览器不支持某些特性, 无法测试
+
+| 浏览器   | 行内绑定 | DOM Level 0 | addEventListener | attachEvent |
+| -------- | -------- | --------    | --------         | -------     |
+| w3c 系列 | Element  | Element     | Element          | X           |
+| ie 系列  | Element  | Element     | Element (ie9+)   | Window      |
+
+=====
+##事件监听器
+
+1. 在IE中使用`attachEvent` 方式绑定的监听器中, `this` 指向`window`对象.
+1. 在其他方式绑定的监听器中, `this` 指向***被绑定的元素***.
+    * 注意: ***被绑定的元素***, 并不是`event.target`, 虽然在某些情况下二者可能是同一对象.
+
+=====
+##事件监听器
+<pre data-md-slide="no"><code class="language-javascript">
+    var addEventListener = function (obj, type, handler) {
+        // do something
+
+    };
+
+</code></pre>
+
+=====
+
+##可读性
+
+
+###将`this`的指向对象赋值给一个命名良好的局部变量
+
+=====
+##that
+
+在纯函数, 对象方法, 类构造函数/类实例方法的情形下
+
+- 推荐将`this`赋值局部变量`that`.
+- 不推荐使用`self`作为局部变量名, 见[JavaScript Reserved Words](http://www.w3schools.com/js/js_reserved.asp).
+
+=====
+##that
+
+<pre data-md-slide="no"><code class="language-javascript">
+var test = function (value) {
+    var that = this;
+    that.hello = value;
+    console.log(that.hello)
+    // do something
+    // ...
+};
+</code></pre>
+
+=====
+##that
+
+<pre data-md-slide="no"><code class="language-javascript">
+var uncleWang = {
+    _name: 'WangXiaobo',
+    getName: function () {
+        var that = this;
+        return that._name;
+    },
+    displayName: function () {
+        var that = this,
+            name = that.getName();
+        console.log('The name is ' + name);
+    }
+};
+</code></pre>
+
+=====
+##that
+
+<pre data-md-slide="no"><code class="language-javascript">
+function Person (name) {
+    var that = this;
+    that._name = name;
+}
+
+Person.prototype.getName = function () {
+    var that = this;
+    return that._name;
+};
+
+Person.prototype.displayName = function () {
+    var that = this,
+        name = that.getName();
+    console.log('name: ' + name);
+};
+
+</code></pre>
+
+=====
+##可读性
+
+<pre data-md-slide="no"><code class="language-javascript">
+// $ 为jQuery
+
+$('h1, h2', document.body).on('click', function () {
+    var el = this;
+    // do something
+});
+
+</code></pre>
+
+
+<pre><code class="language-javascript">
+// $ 为jQuery
+
+$('h1, h2', document.body).on('click', function () {
+    var $el = $(this);
+    // do something
+});
+
+</code></pre>
+
+
+=====
+
+
+##代码压缩
+JavaScript代码压缩工具, 如Closure Compiler, YUI Compressor, UglifyJS, 一般能压
+缩局部变量, 但不能压缩`this`关键字.  如果将`this`赋值给局部变量, 那么`this`能够
+间接被压缩.
+
+=====
+
+##扩展阅读
+1. [Javascript的this用法 - 阮一峰的网络日志](http://www.ruanyifeng.com/blog/2010/04/using_this_keyword_in_javascript.html)
+1. [Function.prototype.apply() - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
+1. [Function.prototype.call() - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call)
+1. [Function.prototype.bind() - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
+1. [Javascript - The this keyword](http://www.quirksmode.org/js/this.html)
+1. [Javascript - Early event handlers](http://www.quirksmode.org/js/events_early.html)
+1. [Javascript - Traditional event registration model](http://www.quirksmode.org/js/events_tradmod.html)
+1. [Javascript - Advanced event registration models](http://www.quirksmode.org/js/events_advanced.html)
+1. [JavaScript Reserved Words](http://www.w3schools.com/js/js_reserved.asp)
+
+
