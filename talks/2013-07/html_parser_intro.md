@@ -28,7 +28,7 @@
 =====
 ##Why htmlParser.js
 * 内容未系统过滤
-<pre><code class="language-html">
+<pre><code class="language-markup">
     普通网页
 
     &lt;div style="float:right"&gt;xxx...&lt;/div&gt;    &lt;= 影响布局

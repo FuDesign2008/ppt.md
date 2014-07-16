@@ -2,8 +2,7 @@
     var TMPL = window.tmpl,
         $ = window.jQuery,
         impress = window.impress,
-        Showdown = window.Showdown,
-        MAKE_HTML = (new Showdown.converter()).makeHtml,
+        marked = window.marked,
         PPT_CONFIG = window.PPT_CONFIG,
         SPLITER = '=====',
         mdPath,
@@ -20,7 +19,7 @@
          * @return {String}
          */
         sectionHtml = function (content) {
-            content = MAKE_HTML(content);
+            content = marked(content);
             idCounter++;
             return TMPL(tmplId, {
                 id: idCounter,
@@ -62,6 +61,18 @@
             $('#impress').html(contents);
             // initialize ppt
             impress().init();
+            if (window.Prism) {
+                $('pre', document.body).each(function (index, pre) {
+                    var code = $('>code', pre).get(0);
+                    if (!code) {
+                        return;
+                    }
+                    if (code.className.indexOf('language') > -1) {
+                        window.Prism.highlightElement(code);
+                    }
+                });
+
+            }
         }, 'text');
     });
 })();
