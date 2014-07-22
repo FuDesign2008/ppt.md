@@ -28,6 +28,7 @@ http://fudesign2008.github.io/ppt.md/
  * http://fudesign2008.github.io/ppt.md/talks/2013-07/html_parser_intro_deck.html
  * http://fudesign2008.github.io/ppt.md/talks/2013-07/jstoolkit_intro_impress.html
  * http://fudesign2008.github.io/ppt.md/talks/2013-07/html_parser_intro_impress.html
+ * http://fudesign2008.github.io/ppt.md/talks/2014-07/javascript-this-deck.html
 
 
 
