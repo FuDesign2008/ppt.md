@@ -87,6 +87,25 @@ var parseHTMLWithIframe = function (markup, context) {
 }
 </code></pre>
 
+
+=====
+##$.parseHTML
+
+<pre data-md-slide="no"><code class="language-javascript">
+var markup = '&lt;p&gt;' +
+        '&lt;img src="http://note.youdao.com/styles/images/icon-1.png?96" data-media-type="image"&gt;' +
+        '&lt;script type="text/javascript"&gt;' +
+            'document.onclick=function(){console.log("click");};' +
+            'window.alert("hello");' +
+            'document.write("hello");' +
+        '&lt;/script&gt;' +
+    '&lt;/p&gt;',
+    domArray = $.parseHTML(markup);
+
+    window.console.log(domArray);
+
+</code></pre>
+
 =====
 
 #&lt;script/&gt;
@@ -94,6 +113,10 @@ var parseHTMLWithIframe = function (markup, context) {
 =====
 
 #&lt;img  <span style="color:#C00;">src="..."</span> /&gt;
+
+=====
+
+#<span style="font-size:5em;color:#333;">?</span>
 
 =====
 
