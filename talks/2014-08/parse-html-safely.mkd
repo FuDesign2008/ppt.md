@@ -1,0 +1,200 @@
+#Parse HTML Safely
+
+=====
+
+
+#HTML -> DOM ?
+
+=====
+
+#jQuery.parseHTML
+
+=====
+
+##jQuery.parseHTML
+
+<pre data-md-slide="no"><code class="language-javascript">
+var markup = '&lt;p&gt;' +
+        '&lt;img src="http://note.youdao.com/styles/images/icon-1.png?96" data-media-type="image"&gt;' +
+        '&lt;script type="text/javascript"&gt;' +
+            'document.onclick=function(){console.log("click");};' +
+            'window.alert("hello");' +
+            'document.write("hello");' +
+        '&lt;/script&gt;' +
+    '&lt;/p&gt;',
+    domArray = $.parseHTML(markup);
+
+    window.console.log(domArray);
+
+</code></pre>
+
+=====
+
+#jQuery.parseHTML ?
+
+=====
+
+##jQuery.parseHTML
+
+<pre data-md-slide="no"><code class="language-javascript">
+var parseHTMLWithDiv = function (markup, context) {
+        context = context || document;
+
+        var wrapper = context.createElement('div'),
+            domArray = [],
+            index,
+            len;
+
+        wrapper.innerHTML = markup;
+        len = wrapper.childNodes.length;
+        for (index = 0; index < len; index++) {
+            domArray.push(wrapper.childNodes[index]);
+        }
+
+        return domArray;
+    };
+</code></pre>
+
+=====
+
+
+#iframe
+
+=====
+
+##iframe
+
+<pre data-md-slide="no"><code class="language-javascript">
+var parseHTMLWithIframe = function (markup, context) {
+    context = context || document;
+    var iframe = context.createElement('iframe'),
+        body,
+        index,
+        len,
+        domArray = [];
+    iframe.src = '';
+    iframe.style.display = 'none';
+    context.body.appendChild(iframe);
+    body = iframe.contentDocument.body;
+    body.innerHTML = markup;
+    len = body.childNodes.length;
+
+    for (index = 0; index < len; index++) {
+        domArray.push(body.childNodes[index]);
+    }
+    context.body.removeChild(iframe);
+    return domArray;
+}
+</code></pre>
+
+=====
+
+#&lt;script/&gt;
+
+=====
+
+#&lt;img  <span style="color:#C00;">src="..."</span> /&gt;
+
+=====
+
+#$.parseXML
+
+=====
+
+##$.parseXML
+
+<pre data-md-slide="no"><code class="language-javascript">
+// Cross-browser xml parsing
+jQuery.parseXML = function( data ) {
+    var xml, tmp;
+    if ( !data || typeof data !== "string" ) {
+        return null;
+    }
+
+    // Support: IE9
+    try {
+        tmp = new DOMParser();
+        xml = tmp.parseFromString( data, "text/xml" );
+    } catch ( e ) {
+        xml = undefined;
+    }
+
+    if ( !xml || xml.getElementsByTagName( "parsererror" ).length ) {
+        jQuery.error( "Invalid XML: " + data );
+    }
+    return xml;
+};
+
+</code></pre>
+
+=====
+
+#DOMParser
+
+=====
+
+##DOMParser
+
+<pre data-md-slide="no"><code class="language-javascript">
+enum SupportedType {
+  "text/html",
+  "text/xml",
+  "application/xml",
+  "application/xhtml+xml",
+  "image/svg+xml"
+};
+
+[Constructor]
+interface DOMParser {
+  Document parseFromString(DOMString str, SupportedType type);
+};
+
+</code></pre>
+
+=====
+
+#createHTMLDocument
+
+=====
+##DOMParser/createHTMLDocument
+
+<pre data-md-slide="no"><code class="language-javascript">
+var parseHTML = function (markup, context) {
+    var doc, parser, win;
+
+    context = context || document;
+
+    if (context.implementation && context.implementation.createHTMLDocument) {
+        doc = context.implementation.createHTMLDocument();
+        doc.body.innerHTML = markup;
+        return doc;
+    }
+
+    win = context.defaultView || window;
+    if (win.DOMParser) {
+        parser = new win.DOMParser();
+        try {
+            doc = parser.parseFromString('', 'text/html');
+        } catch (ex) {
+            // do nothing
+        }
+        if (doc) {
+            doc.body.innerHTML = markup;
+            return doc;
+        }
+    }
+
+};
+
+</code></pre>
+
+=====
+
+
+##Reference
+1. https://code.google.com/p/google-caja/issues/detail?id=1823
+1. http://api.jquery.com/jquery.parsehtml/
+1. https://developer.mozilla.org/en-US/docs/Web/API/DOMParser
+1. http://domparsing.spec.whatwg.org/
+1. https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation.createHTMLDocument
+
