@@ -1,0 +1,144 @@
+#innerText vs textContent
+
+=====
+
+#获取/设置节点内部文本
+
+=====
+
+#HTMLElement.innerText
+
+
+=====
+##innerText Readonly
+
+* `html`
+* `table`
+* `tBody`
+* `tFoot`
+* `tHead`
+* `tr`
+
+=====
+
+#Node.textContent
+
+=====
+
+##textContent
+
+| NodeType                                                                                 | Content                                                                                                                                                                                   |
+|------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ELEMENT_NODE, ATTRIBUTE_NODE, ENTITY_NODE, ENTITY_REFERENCE_NODE, DOCUMENT_FRAGMENT_NODE | concatenation of the textContent attribute value of every child node, excluding COMMENT_NODE and PROCESSING_INSTRUCTION_NODE nodes. This is the empty string if the node has no children. |
+| TEXT_NODE, CDATA_SECTION_NODE, COMMENT_NODE, PROCESSING_INSTRUCTION_NODE                 | `nodeValue`                                                                                                                                                                               |
+| DOCUMENT_NODE, DOCUMENT_TYPE_NODE, NOTATION_NODE                                         | null                                                                                                                                                                                      |
+
+=====
+
+##Compatibility
+
+| Types         | IE   | FF  | Chrome | Safari | Opera |
+|---------------|------|-----|--------|--------|-------|
+| `innerText`   | YES  | NO  | YES    | YES    | YES   |
+| `textContent` | IE9+ | YES | YES    | YES    | YES   |
+
+=====
+
+##innerText VS textContent
+
+<pre data-md-slide="no"><code class="language-markup">
+    &lt;html&gt;
+        &lt;head&gt; ...&lt;/head&gt;
+        &lt;body&gt;
+            &lt;script&gt;
+                window.alert("hello world");
+            &lt;/script&gt;
+            &lt;style&gt;
+                div {
+                    background-color: #FFCCFF;
+                }
+            &lt;/style&gt;
+            &lt;div&gt;This is a div tag&lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+
+<pre data-md-slide="no"><code class="language-javascript">
+    console.log(document.body.innerText);
+    console.log(document.body.textContent);
+</code></pre>
+
+
+=====
+
+##innerText VS textContent
+
+<pre data-md-slide="no"><code class="language-markup">
+    &lt;html&gt;
+        &lt;head&gt; ...&lt;/head&gt;
+        &lt;body&gt;
+            &lt;p style="visibility: hidden;"&gt;hidden p tag&lt;/p&gt;
+            &lt;div&gt;This is a div tag&lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+<pre data-md-slide="no"><code class="language-javascript">
+    console.log(document.body.innerText);
+    console.log(document.body.textContent);
+</code></pre>
+
+
+
+=====
+
+##innerText VS textContent
+
+<pre data-md-slide="no"><code class="language-markup">
+    &lt;html&gt;
+        &lt;head&gt; ...&lt;/head&gt;
+        &lt;body&gt;
+            &lt;div&gt;This is a
+            div tag&lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+
+<pre data-md-slide="no"><code class="language-javascript">
+    var divElement = document.querySelector('div');
+    console.log(div.innerText);
+    console.log(div.textContent);
+</code></pre>
+
+
+=====
+##innerText VS textContent
+
+
+<pre data-md-slide="no"><code class="language-javascript">
+    var scriptA = document.createElement('script'),
+        scriptB = document.createElement('script');
+
+    scriptA.innerText = 'window.alert("hello scriptA")';
+    scriptB.textContent = 'window.alert("hello scriptB")';
+</code></pre>
+
+
+=====
+##Differences
+
+| Types                         | `innerText` | `textContent` |
+|-------------------------------|-------------|---------------|
+| defined in ...                | HTMLElement | Node          |
+| include `<script>`, `<style>` | NO          | YES           |
+| include hidden elements       | NO          | YES           |
+| include whitespace            | NO          | YES           |
+| script safely                 | YES         | NO            |
+| trigger reflow                | YES         | NO            |
+
+=====
+
+##参考资料
+* http://msdn.microsoft.com/en-us/library/ie/ms533899(v=vs.85).aspx
+* https://developer.mozilla.org/en-US/docs/Web/API/Node.textContent
+* http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-textContent
+* http://www.kellegous.com/j/2013/02/27/innertext-vs-textcontent/
