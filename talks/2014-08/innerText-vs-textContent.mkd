@@ -1,12 +1,12 @@
-#innerText vs textContent
+<h1 style="font-size:3.5em;">innerText <span style="color: #C00;">vs</span> textContent</h1>
 
 =====
 
-#获取/设置节点内部文本
+<h1 style="font-size:3.5em;">获取/设置节点内部文本</h1>
 
 =====
 
-#HTMLElement.innerText
+<h1 style="font-size:3.5em;"><span style="color: #C00;">HTMLElement</span>.innerText</h1>
 
 
 =====
@@ -21,7 +21,7 @@
 
 =====
 
-#Node.textContent
+#<span style="color: #C00;">Node</span>.textContent
 
 =====
 
