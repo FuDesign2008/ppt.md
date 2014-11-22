@@ -1,0 +1,200 @@
+
+#云笔记编辑器重构
+
+<p>&nbsp;</p>
+<p style="text-align: right;">傅云贵 ( fuyg ) </p>
+
+<!--
+    大家好， 我是云笔记组的傅云贵， 今天想跟大家分享一下有道云笔记编辑器重构方面的技术.
+    在 2013 年6月份左右, 云笔记编辑器遇到一些问题无法解决, 于是我们打算重新设计编辑器以解决相关问题.
+-->
+
+
+
+
+=====
+
+##Contents
+
+1. 云笔记编辑器 ( What )
+1. 为什么要重构 ( Why )
+1. 如何重构 ( How )
+
+<!--
+
+-->
+
+=====
+
+##编辑器原理
+
+* 笔记内容 ( HTML )
+* 浏览器 + `Contenteditable`
+
+=====
+
+##编辑器中的数据
+
+<p>&nbsp;</p>
+
+![editor data flow](./editor-refactor-images/editor-data-flow.png)
+
+
+=====
+
+##编辑命令的3个层次
+
+1. 浏览器原生命令 ( nicEditor )
+1. JavaScript模拟原生编辑命令 ( ckEditor, UEditor, KindEditor )
+1. JavaScript实现渲染和编辑命令 ( Google Doc, Office 365 )
+
+=====
+
+##编辑器的问题
+
+1. 工具函数
+1. 内容过滤
+1. 架构设计
+1. 非`contenteditable`元素
+1. 编辑命令
+
+=====
+##工具函数
+
+* 常用工具函数散乱, 代码组织比较混乱
+* jQuery 局限与导致的bug
+
+<!--
+
+1. 常用工具函数散乱, 代码组织比较混乱
+1. 编辑器中使用jQuery操作DOM会带来bug
+1. jQuery 局限性
+
+-->
+
+=====
+##内容过滤
+
+* 零散的过滤规则
+
+<!--
+
+1. 零散的过滤规则, 但无法系统过滤内容
+    * 尤其是不能系统过滤粘贴的内容及其格式, 不合理的内容影响笔记的编辑以及编辑器的处理
+
+-->
+
+=====
+##架构设计
+
+* 过滤器分类粗糙
+* MS Word粘贴格式错乱
+* 性能问题
+
+<!--
+* 过滤器分类粗糙, 只有get/set filter, 不能更细致的管理
+* MS Word粘贴存在格式错乱问题
+* 性能问题
+    * 获取内容相关信息时, 每个filter各自提取, 有些信息是重合的, 影响性能
+    * paste时, 使用set filter 对整个文档处理, 效率低下
+-->
+
+=====
+##非`contenteditable`元素
+
+* 实现难度高
+* 开发成本高
+* 可维护性差
+* bug多
+* 用户体验差
+
+<!--
+1. 非contenteditable元素在编辑器中的实现难度高, 开发成本高, 可维护性差
+1. 多个非contenteditable元素直接放到编辑器中, 开发难度呈指数趋势上升
+1. 非contenteditable元素直接放到编辑器中, 也会导致contenteditable区域处理逻辑复杂度上升
+1. 非contenteditable元素在编辑器中容易引起bug
+    * 复制粘贴不理想, 不能复制粘贴或者粘贴时丢失内容
+    * ios上, 交互非contenteditable元素时, 整个编辑器变成不可编辑器状态, contenteditable与非contenteditable区域多次切换会导致contenteditable区域不能编辑
+1. 非contenteditable元素在编辑器中直接编辑, 用户体验不是很好, 也没办法将用户体验做好
+1. 非contenteditable元素直接放在编辑器中导致编辑器整体复杂度上升, 更容易引起崩溃
+-->
+=====
+##编辑命令
+
+* 无法解决某些bug
+* 可控性差
+* 扩展性差
+
+<!--
+1. 使用浏览器原生编辑命令, 无法比较彻底解决现有bug, 比如undo/redo
+    * 在js层面看来, 浏览器的原生编辑命令是个黑盒, 无法控制
+1. 浏览器的原生编辑命令在处理富文本时, 会产生我们不想要的tag或者属性
+1. 如果能够js实现编辑命令而不依赖原生命令, 能提高编辑器的扩展性
+-->
+
+
+
+=====
+
+<h1 style="font-size: 600%;">？</h1>
+
+
+=====
+
+<table class="bordered">
+    <thead>
+        <tr>
+            <th>问题</th>
+            <th>解决</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>工具函数</td>
+            <td>JSToolKit</td>
+        </tr>
+        <tr>
+            <td>内容过滤</td>
+            <td>htmlParser.js</td>
+        </tr>
+        <tr>
+            <td>架构设计</td>
+            <td>重新设计</td>
+        </tr>
+        <tr>
+            <td>非<code>contenteditable</code>元素</td>
+            <td>图片化</td>
+        </tr>
+        <tr>
+            <td>编辑命令</td>
+            <td>自实现编辑命令</td>
+        </tr>
+    </tbody>
+</table>
+
+=====
+
+##JSToolKit是什么
+
+一个高度分层的JavaScript工具库
+
+健壮、 强通用性和高扩展性
+
+
+=====
+
+##JSToolKit设计理念
+
+KISS 原则
+
+开源优先
+
+=====
+
+##JSToolKit结构
+
+![JSToolKit 结构图](./editor-refactor-images/jstoolkit-st.png)
+
+=====
+
+
