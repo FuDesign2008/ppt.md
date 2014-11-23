@@ -151,7 +151,7 @@
     <tbody>
         <tr>
             <td>工具函数</td>
-            <td>JSToolKit</td>
+            <td>JTK</td>
         </tr>
         <tr>
             <td>内容过滤</td>
@@ -173,17 +173,15 @@
 </table>
 
 =====
+##JTK是什么
 
-##JSToolKit是什么
+JavaScript Tool Kit
 
-一个高度分层的JavaScript工具库
-
-健壮、 强通用性和高扩展性
-
+一个轻量的JavaScript工具库
 
 =====
 
-##JSToolKit设计理念
+##JTK设计理念
 
 KISS 原则
 
@@ -191,10 +189,402 @@ KISS 原则
 
 =====
 
-##JSToolKit结构
+##JTK结构
 
-![JSToolKit 结构图](./editor-refactor-images/jstoolkit-st.png)
+<!--图片放大1.5倍-->
+<p><img style="width: 770px; 390px;" src="./editor-refactor-images/jstoolkit-st.png" alt="JTK 结构图"></p>
+
+<!--
+总共分为四个模块:
+
+1. Core. 以Underscore为核心, 并添加了JavaScript语言级的扩展. 该模块可以与JavaScript的宿主环境无关, 可以在浏览器, Node.js等平台上运行.
+1. Web. 封装了一些浏览器相关的常用功能, 比如BOM/DOM操作, 事件(Event)封装. 该模块依赖Core.
+1. jQ. 封装了jQuery, 根据项目需求, 可以引入jQuery UI等jQuery插件. 该模块依赖Core.
+1. MVC. 封装了Backbone, 该模块依赖Core.
+-->
 
 =====
 
+##JTK Build流程
+
+GruntJS
+
+1. JSHint
+1. QUnit
+    * 示例链接: [core_debug.html](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/JTK/branches/v1.1.2/test/core_debug.html)
+    * 命令行运行: <code style="background-color: #303030; color:green; padding: 3px 10px; border-radius: 5px;">grunt test</code>
+
+=====
+##JTK特点
+
+* 强通用性
+* 高扩展性
+* 健壮
+
+
+=====
+
+<table class="bordered">
+    <thead>
+        <tr>
+            <th>问题</th>
+            <th>解决</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="gray">
+            <td>工具函数</td>
+            <td>JTK</td>
+        </tr>
+        <tr class="hilight">
+            <td>内容过滤</td>
+            <td>htmlParser.js</td>
+        </tr>
+        <tr>
+            <td>架构设计</td>
+            <td>重新设计</td>
+        </tr>
+        <tr>
+            <td>非<code>contenteditable</code>元素</td>
+            <td>图片化</td>
+        </tr>
+        <tr>
+            <td>编辑命令</td>
+            <td>自实现编辑命令</td>
+        </tr>
+    </tbody>
+</table>
+
+=====
+##htmlParser.js 需求分析
+
+云笔记内容HTML格式存储
+
+<pre>
+    html
+     |-- head
+     |-- body      => body 里面的内容即为笔记的内容
+          |-- xxx ...
+          |....
+</pre>
+
+=====
+##htmlParser.js 需求分析
+
+<pre><code class="language-markup">
+    //普通网页
+
+    &lt;div style="float:right"&gt;xxx...&lt;/div&gt;    &lt;= 影响布局
+    &lt;div class="right"&gt;xxxx...&lt;/div&gt;         &lt;= 影响布局
+    &lt;img width=100 height=200 /&gt;              &lt;= 影响布局
+    &lt;object&gt;...&lt;/object&gt;                     &lt;= 不想要
+
+    //MS Office粘贴
+
+    &lt;p style='margin-left:21.0pt;
+    mso-char-indent-count:0;           <= mso-
+    mso-list:l2 level1 lfo4;           <= mso-
+    ...
+</code></pre>
+
+=====
+##htmlParser.js 需求分析
+
+
+![absolute.png](./editor-refactor-images/absolute.png)
+
+<!--
+
+内容格式影响
+1. 编辑器对内容的处理
+1. 用户的编辑体验
+
+-->
+
+=====
+##htmlParser.js 处理
+
+1. tag
+1. attribute
+    * class
+    * style
+
+<!--
+1. 对html内容进行处理, 使得内容符合特定html规范子集.
+-->
+
+=====
+##htmlParser.js 可配置
+
+
+![html-parser-rule.png](./editor-refactor-images/html-parser-rule.png)
+
+<!--
+1. 规则可配置
+-->
+
+
+=====
+<h1>htmlParser.js<span style="font-size: 300%;color:#666;">？</span></h1>
+
+
+=====
+##htmlParser.js 思路
+
+![html-parser-flow.png](./editor-refactor-images/html-parser-flow.png)
+
+=====
+##[parse.js](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/branches/v1.1/src/parser/parse.js)
+
+
+<pre><code class="language-javascript">
+/**
+ * @param {HTMLElement|String} elementOrHtml
+ * @param {Object} rules
+ * @param {Document} [context = document]
+ * @param {Boolean} [clean = false]
+ * @param {Boolean} [simplify = false]
+ * @return {HTMLElement|String}
+ */
+return function (elementOrHtml, rules, context, clean, simplify) {
+    // ...
+};
+
+</code></pre>
+
+=====
+##[rules.js](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/branches/v1.1/src/parser/rules.js)
+
+<pre><code class="language-javascript">
+
+return function (options) {
+    return _.extend({
+        defaultTag: 'span',
+        tags: {},
+        attributes: {
+        },
+        styles: true,
+        classes: true
+    }, options);
+};
+
+</code></pre>
+
+=====
+##htmlParser.js 示例
+
+源代码
+
+<pre><code class="language-markup">
+&lt;div data-src="http://www.youdao.com/file.png"&gt;
+    &lt;div&gt;
+        &lt;footer data-src="file:///var/cache/file.png"
+                style="font-size: 100px;
+                       font-weight:bold;
+                       mso-font-family: 宋体;" &gt;
+            Hello htmlParser.js
+            &lt;p&gt;&lt;span&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<!--
+    1. 简化标签嵌套
+    1. 移除空标签
+    1. footer => p
+    1. 属性 `data-src` 如果值以`http`开头则保留， 否则移除
+    1. style 保留 font-weight
+    1. style 移除 font-size
+    1. style 重命名 mso-font-family => font-family
+-->
+
+
+=====
+##htmlParser.js 示例
+
+目标代码
+
+<pre><code class="language-markup">
+&lt;div data-src="http://www.youdao.com/file.png"&gt;
+    &lt;p style="font-weight:bold;font-family: 宋体;" &gt;
+        Hello htmlParser.js
+    &lt;/p&gt;'
+&lt;/div&gt;
+</code></pre>
+
+=====
+
+##htmlParser.js 示例
+
+规则
+
+1. 简化标签嵌套
+1. 移除空标签
+1. footer => p
+1. 属性 `data-src` 如果值以`http`开头则保留， 否则移除
+1. style 保留 font-weight
+1. style 移除 font-size
+1. style 重命名 mso-font-family => font-family
+
+=====
+
+##htmlParser.js 示例
+
+规则配置 [test](http://fuyg.youdao.com/youdao/htmlParser/v1.1/test/qunit_test_debug.html?filter=parser%2Fparse)
+
+<pre><code class="language-javascript">
+rules = {
+    tags: { 'div': true, 'p': true, 'footer': 'p' },
+    attributes: {
+        datasetFilter: function (value, prop) {
+            if (prop === 'src' && /^http/i.test(value)) {
+                return true;
+            }
+        }
+    },
+    styles: { 'font-weight': true, 'mso-font-family': 'font-family' }
+};
+result = parse(temp, rules , document, true, true);
+</code></pre>
+
+
+=====
+##htmlParser.js Build流程
+
+GruntJS
+
+1. JSHint
+1. QUnit
+    * 链接: [qunit_test.html](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/branches/v1.1/test/qunit_test.html)
+    * 命令行运行: <code style="background-color: #303030; color:green; padding: 3px 10px; border-radius: 5px;">grunt test</code>
+=====
+
+<table class="bordered">
+    <thead>
+        <tr>
+            <th>问题</th>
+            <th>解决</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="gray">
+            <td>工具函数</td>
+            <td>JTK</td>
+        </tr>
+        <tr class="gray">
+            <td>内容过滤</td>
+            <td>htmlParser.js</td>
+        </tr>
+        <tr class="hilight">
+            <td>架构设计</td>
+            <td>重新设计</td>
+        </tr>
+        <tr>
+            <td>非<code>contenteditable</code>元素</td>
+            <td>图片化</td>
+        </tr>
+        <tr>
+            <td>编辑命令</td>
+            <td>自实现编辑命令</td>
+        </tr>
+    </tbody>
+</table>
+
+=====
+##编辑器重新设计
+
+1. 基于JTK
+1. filter & FilterManager
+1. 粘贴机制
+1. 性能
+1. 代码结构
+
+<!--
+1. 基于具有单元测试的JTK框架开发, 常用的底层工具函数更稳定可靠.
+    * 编辑器核心部分 JTK web 层替代jQuery
+1. filter & FilterManager
+    * 过滤器(filter)分类更详细(新增paste, runtime分类), 可以更精细的控制filter执行, 提高性能.
+    * FilterManager增加共享对象, 各个filter在执行时共享信息, 只运行一次获取信息过程, 提高性能.
+        ▸ beforePaste/
+        ▸ input/
+        ▸ key/
+        ▸ output/
+        ▸ paste/
+        ▸ runtime/
+1. 改进粘贴的处理机制, 集成HtmlParser.js和msoConvertor, 更好的控制输入的内容的格式.
+1. 性能
+    * ContextMenu增加共享对象, 各个ContextMenuItem在执行时共享信息, 只运行一次获取信息过程, 提高性能.
+    * JavaScript模板预编译, 省去程序运行时的编译过程, 提高性能.
+
+-->
+
+=====
+##编辑器重新设计
+
+![editor2013-tech.png](./editor-refactor-images/editor2013-tech.png)
+
+=====
+##编辑器重新设计
+
+粘贴机制
+
+* 不处理
+* 单独处理
+
+=====
+
+##单独处理
+
+获取粘贴内容的方式
+
+* H5 Paste Event
+* Native
+* Paste Event + Contenteditable Layer
+
+=====
+##Native
+
+* 区分纯/富文本
+* 来源
+* 图片数据
+
+=====
+##粘贴机制
+
+![paste-flow.png](./editor-refactor-images/paste-flow.png)
+
+
+=====
+
+<table class="bordered">
+    <thead>
+        <tr>
+            <th>问题</th>
+            <th>解决</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="gray">
+            <td>工具函数</td>
+            <td>JTK</td>
+        </tr>
+        <tr class="gray">
+            <td>内容过滤</td>
+            <td>htmlParser.js</td>
+        </tr>
+        <tr class="gray">
+            <td>架构设计</td>
+            <td>重新设计</td>
+        </tr>
+        <tr class="hilight">
+            <td>非<code>contenteditable</code>元素</td>
+            <td>图片化</td>
+        </tr>
+        <tr>
+            <td>编辑命令</td>
+            <td>自实现编辑命令</td>
+        </tr>
+    </tbody>
+</table>
 
