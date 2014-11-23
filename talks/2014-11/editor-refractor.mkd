@@ -588,3 +588,15 @@ GruntJS
     </tbody>
 </table>
 
+=====
+##非`contenteditable`元素
+
+* 实现难度高
+* 开发成本高
+* 可维护性差
+* bug多
+* 用户体验差
+
+##图片化
+
+
