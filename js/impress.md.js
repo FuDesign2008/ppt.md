@@ -9,10 +9,10 @@
         tmplId = 'ppt_item_tmpl',
         idCounter = 0,
         random360 = function () {
-            return Math.ceil(Math.random() * 360);
+            return Math.ceil(Math.random() * (PPT_CONFIG.maxAngle || 360));
         },
         randomScale = function () {
-            return Math.ceil(Math.random() * 5);
+            return Math.ceil(Math.random() * (PPT_CONFIG.maxScale || 5));
         },
         /**
          * @param {String} content

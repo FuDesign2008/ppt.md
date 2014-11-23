@@ -26,10 +26,11 @@
 
 =====
 
-##编辑器原理
+##编辑器基本原理
 
 * 笔记内容 ( HTML )
 * 浏览器 + `Contenteditable`
+* Selection / Range + Command
 
 =====
 
@@ -44,7 +45,7 @@
 
 ##编辑命令的3个层次
 
-1. 浏览器原生命令 ( nicEditor )
+1. 浏览器原生命令 ( nicEdit )
 1. JavaScript模拟原生编辑命令 ( ckEditor, UEditor, KindEditor )
 1. JavaScript实现渲染和编辑命令 ( Google Doc, Office 365 )
 
@@ -525,32 +526,40 @@ GruntJS
 ![editor2013-tech.png](./editor-refactor-images/editor2013-tech.png)
 
 =====
-##编辑器重新设计
+##粘贴机制
 
-粘贴机制
-
-* 不处理
-* 单独处理
+* 不预处理
+* 预处理
 
 =====
 
-##单独处理
+##预处理
 
-获取粘贴内容的方式
+获取粘贴内容
 
-* H5 Paste Event
-* Native
-* Paste Event + Contenteditable Layer
+
+=====
+
+##预处理
+
+获取方式
+
+* Paste Event & clipboardData
+* `Ctrl / Meta + V`  & Contenteditable Layer
+* Paste Event & Native
 
 =====
 ##Native
 
+优点
+
 * 区分纯/富文本
-* 来源
 * 图片数据
+* 来源
 
 =====
-##粘贴机制
+
+粘贴机制
 
 ![paste-flow.png](./editor-refactor-images/paste-flow.png)
 
@@ -597,6 +606,216 @@ GruntJS
 * bug多
 * 用户体验差
 
+=====
+##非`contenteditable`元素
+
+<pre><code class="language-markup">
+&lt;article class="editor-area" contenteditable="true"&gt;
+    ...
+    &lt;div class="ynote-todo-outer"&gt;
+        &lt;div contenteditable="false" class="ynote-todo-wrapper"&gt;
+            &lt;div contenteditable="false" class="ynote-todo-container"&gt;
+                &lt;input ...&gt;
+                &lt;img ...&gt;
+                &lt;input ...&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    ...
+&lt;/article&gt;
+</code></pre>
+=====
 ##图片化
 
+<pre><code class="language-markup">
+&lt;article class="editor-area" contenteditable="true"&gt;
+    ...
+    &lt;img class="ynote-todo" ...&gt;
+    ...
+&lt;/article&gt;
+
+</code></pre>
+
+=====
+
+##图片化
+
+![imagelize.png](./editor-refactor-images/imagelize.png)
+
+=====
+##图片化
+
+1. 待办事项
+1. 代码支持
+
+=====
+##图片化
+
+演示 [code editor](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/editor2013/branches/pc_code/dist/pc/editor.html)
+
+=====
+##图片化
+
+演示 `iPhone Todo`
+
+
+=====
+##图片化
+
+缺点
+
+* 大图片时不适合
+
+
+=====
+
+<table class="bordered">
+    <thead>
+        <tr>
+            <th>问题</th>
+            <th>解决</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="gray">
+            <td>工具函数</td>
+            <td>JTK</td>
+        </tr>
+        <tr class="gray">
+            <td>内容过滤</td>
+            <td>htmlParser.js</td>
+        </tr>
+        <tr class="gray">
+            <td>架构设计</td>
+            <td>重新设计</td>
+        </tr>
+        <tr class="gray">
+            <td>非<code>contenteditable</code>元素</td>
+            <td>图片化</td>
+        </tr>
+        <tr class="hilight">
+            <td>编辑命令</td>
+            <td>自实现编辑命令</td>
+        </tr>
+    </tbody>
+</table>
+
+=====
+
+##编辑命令的3个层次
+
+1. 浏览器原生命令
+1. JavaScript模拟原生编辑命令
+1. JavaScript实现渲染和编辑命令
+
+=====
+
+#自实现编辑命令
+
+=====
+
+#Undo/Redo
+
+=====
+
+##Undo/Redo 原理
+
+Snapshot
+
+1. HTML内容(反)序列化
+1. 光标/选区位置(反)序列化
+
+=====
+##Undo/Redo 原理
+
+HTML内容(反)序列化
+
+<pre><code class="language-javascript">
+var savedContent = article.innerHTML;
+
+...
+
+article.innerHTML = savedContent;
+
+</code></pre>
+
+=====
+##Undo/Redo 原理
+
+光标/选区位置(反)序列化
+
+标签法
+
+=====
+##Undo/Redo 原理
+
+光标/选区位置 => [Range](https://developer.mozilla.org/en-US/docs/Web/API/range)
+
+
+=====
+##Undo/Redo 原理
+
+Range序列化
+
+<pre><code class="language-javascript">
+Range.collapsed
+Range.startContainer
+Range.startOffset
+Range.endContainer
+Range.endOffset
+</code></pre>
+
+=====
+##Undo/Redo 原理
+
+Range序列化
+
+<pre><code class="language-javascript">
+Range.startContainer
+Range.endContainer
+</code></pre>
+=====
+##Undo/Redo 原理
+
+Range序列化
+
+<pre><code class="language-javascript">
+// startContainer  endContainer
+
+{
+    isRoot: '是否是编辑器根节点',
+    tag: 'HTMLElement的tagName, 如果不存在, 则该节点为TextNode',
+    tagIndex: '笔记内容相同tagName的节点中HTMLElement的位置',
+    childIndex: '在TextNode节点的开始位置'
+}
+
+</code></pre>
+
+=====
+##Undo/Redo 原理
+
+Range反序列化
+
+=====
+
+Undo/Redo 原理
+
+<!-- 图片放大1.2倍 -->
+<p><img style="width:767px;height:270px;" src="./editor-refactor-images/undoRedo.png" alt="undoRedo.png"></p>
+
+
+=====
+##编辑命令的3个层次
+
+1. 浏览器原生命令
+1. JavaScript模拟原生编辑命令
+1. JavaScript实现渲染和编辑命令
+
+=====
+<h1 style="font-size: 600%;">未来</h1>
+
+
+=====
+
+#Thank You
 
