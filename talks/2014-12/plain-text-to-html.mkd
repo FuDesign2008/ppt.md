@@ -185,7 +185,7 @@ urlReg =
 
 html = text.repace(/&lt;/g, '{&amp;lt;}').replace(/&gt;/g, '{&ampgt;}');
 html = html.replace(urlReg, function () {...});
-html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
+html = html.repace(/\{&amp;lt;\}/g, '&amp;lt;').replace(/\{&ampgt;\}/g, '&amp;gt;');
 
 </code></pre>
 =====
@@ -202,7 +202,7 @@ html = text.repace(/\{&amp;lt;\}/g, '{{&amp;lt;}}').
             replace(/\{&amp;gt;\}/g, '{{&ampgt;}}');
 html = html.repace(/&lt;/g, '{&amp;lt;}').replace(/&gt;/g, '{&ampgt;}');
 html = html.replace(urlReg, function () {...});
-html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
+html = html.repace(/\{&amp;lt;\}/g, '&amp;lt;').replace(/\{&ampgt;\}/g, '&amp;gt;');
 
 </code></pre>
 
@@ -250,7 +250,6 @@ html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
 <pre><code class="language-javascript" style="font-size: 80%;">
 .............urlA..........urlB..................
 
-* 普通文本需要escape
 
 </code></pre>
 =====
@@ -259,6 +258,8 @@ html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
 
 <pre><code class="language-javascript" style="font-size: 80%;">
 .............urlA..........urlB..................
+
+* 普通文本需要彻底escape
 
 </code></pre>
 
@@ -274,6 +275,8 @@ html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
                  ++++++++++
                           [urlB]
                                +++++++++++++++++
+
++++++++++++++[urlA]++++++++++[urlB]+++++++++++++++++
 </code></pre>
 
 =====
@@ -289,6 +292,40 @@ html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
     fullUrl: 'String'  // www.example.com -> http://www.example.com
     length: 'Integer' // url.length
 }
+
+</code></pre>
+=====
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlA 分析
+{
+    start: 'Integer',
+    url: 'String',    // -> urlA
+    fullUrl: 'String'  // www.example.com -> http://www.example.com
+    length: 'Integer' // url.length
+}
+
+urlA -> [urlA]
+
+拼合成HTML [urlA]
+
+</code></pre>
+
+=====
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+
+.... -> ++++
+
+text_part = ....; // 获取部分plain text
+
+html_part = _.escape(text_part);
 
 </code></pre>
 
@@ -326,18 +363,41 @@ https://github.com/FuDesign2008/htmlize
 #Thank You
 
 =====
-##提问
+##提问: 拼合HTML
 
 <pre><code class="language-javascript" style="font-size: 80%;">
-给一个url地址, 如何创建一个`a`标签的合法HTML
-* 使用纯粹文本处理方法
+.............urlA..........urlB..................
 
-var linkHTML = function (url) {
-    var element = document.create('a');
-    element.setAttribute('href', url);
-    element.innerText = url;
+urlA -> [urlA]
+
+urlA 分析
+{
+    start: 'Integer',
+    url: 'String',    // -> urlA
+    fullUrl: 'String'  // www.example.com -> http://www.example.com
+    length: 'Integer' // url.length
+}
+</code></pre>
+
+=====
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+/**
+ * @param {Object} urlInfo
+ * @param {String} urlInfo.url
+ * @param {String} urlInfo.fullUrl
+ * @return {String}
+ */
+var linkHTML = function (urlInfo) {
+    var element = document.createElement('a');
+    element.setAttribute('href', urlInfo.fullUrl);
+    element.innerText = urlInfo.url;
+
     return element.outerHTML;
 }
+
+* 使用纯粹文本处理方法
+* &lt;a href="{{fullUrl}}"&gt;{{url}}&lt;/a&gt;
 
 </code></pre>
 
