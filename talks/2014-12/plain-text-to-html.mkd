@@ -1,0 +1,345 @@
+
+<p style="text-align: center;">Plain Text to HTML</p>
+<p>&nbsp;</p>
+
+#URL/Email地址识别
+
+<p>&nbsp;</p>
+<p style="text-align: right;">傅云贵 ( fuyg ) </p>
+
+
+
+
+
+=====
+
+##场景
+
+
+PC/iOS/Android - 粘贴纯文本
+
+* 演示
+
+<!--
+
+演示
+
+-->
+
+
+=====
+
+##主要流程
+
+
+1. 编辑器阻止默认粘贴行为, 通知native 有粘贴动作
+1. native 分析剪贴板, 获取纯文本
+1. native 发送纯文本给编辑器
+1. 编辑器分析纯文本
+    * 如果能够识别某些内容, 将纯文本转化成富文本
+    * 如果没有能够识别的某些内容, 不做处理
+1. 编辑器插入分析后的内容
+
+<!--
+
+再次演示
+
+-->
+
+
+=====
+
+##主要流程
+
+* 演示
+
+
+=====
+
+##编辑器分析纯文本
+
+Plain Text to HTML
+
+=====
+
+##识别内容
+
+* URL/Email 地址
+
+* 列表
+
+* 换行/横线/空格...
+
+<!--
+
+再次演示
+
+-->
+
+=====
+
+##识别内容
+
+* [演示](http://fuyg.youdao.com/youdao/htmlize/trunk/test/test_debug.html)
+
+=====
+
+#URL/Email 地址识别
+
+=====
+
+#One Line
+
+=====
+
+
+#How to ?
+
+=====
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+
+
+hello world http://www.example.com/ ynote site: www.youdao.com 有道云笔记
+
+</code></pre>
+
+=====
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+
+hello world http://www.example.com/ ynote site: www.youdao.com 有道云笔记
+
+.............urlA..........urlB..................
+
+</code></pre>
+
+
+
+
+
+=====
+
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlReg =
+    /(https?:\/\/|www\.|ssh:\/\/|ftp:\/\/)[a-z0-9&_+\-\?\/\.=\#,:]+/i;
+
+
+</code></pre>
+
+=====
+
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlReg =
+    /(https?:\/\/|www\.|ssh:\/\/|ftp:\/\/)[a-z0-9&_+\-\?\/\.=\#,:]+/i;
+
+
+html = html.replace(urlReg, function () {...});
+
+
+</code></pre>
+
+=====
+
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlReg =
+    /(https?:\/\/|www\.|ssh:\/\/|ftp:\/\/)[a-z0-9&_+\-\?\/\.=\#,:]+/i;
+
+html = text.repace(/&lt;/g, '&amp;lt;').replace(/&gt;/g, '&ampgt;');
+
+html = html.replace(urlReg, function () {...});
+
+
+</code></pre>
+
+
+=====
+
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlReg =
+    /(https?:\/\/|www\.|ssh:\/\/|ftp:\/\/)[a-z0-9&_+\-\?\/\.=\#,:]+/i;
+
+html = text.repace(/&lt;/g, '{&amp;lt;}').replace(/&gt;/g, '{&ampgt;}');
+html = html.replace(urlReg, function () {...});
+html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
+
+</code></pre>
+=====
+
+##URL/Email 地址识别
+
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+urlReg =
+    /(https?:\/\/|www\.|ssh:\/\/|ftp:\/\/)[a-z0-9&_+\-\?\/\.=\#,:]+/i;
+html = text.repace(/\{&amp;lt;\}/g, '{{&amp;lt;}}').
+            replace(/\{&amp;gt;\}/g, '{{&ampgt;}}');
+html = html.repace(/&lt;/g, '{&amp;lt;}').replace(/&gt;/g, '{&ampgt;}');
+html = html.replace(urlReg, function () {...});
+html = html.repace(/\{&amp;lt;\}/g, '&lt;').replace(/\{&ampgt;\}/g, '&gt;');
+
+</code></pre>
+
+
+
+=====
+
+<p style="text-align:center;"><img src="./plainText/beiyin.jpg"></p>
+
+=====
+
+<p style="text-align:center;"><img src="./plainText/beiyin2.jpg"></p>
+
+=====
+
+<p style="text-align:center;"><img src="./plainText/dingxiang.jpeg"></p>
+
+=====
+
+##URL/Email 地址识别
+
+演示
+
+
+=====
+
+##URL/Email 地址识别
+
+边界条件下
+
+=====
+
+<p style="text-align:center;"><img src="./plainText/ti.jpg"></p>
+
+=====
+
+##URL/Email 地址识别
+
+[边界条件演示](http://jira.corp.youdao.com/browse/YNEDT-389)
+
+=====
+
+##回顾
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+* 普通文本需要escape
+
+</code></pre>
+=====
+
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+</code></pre>
+
+=====
+
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
++++++++++++++
+            [urlA]
+                 ++++++++++
+                          [urlB]
+                               +++++++++++++++++
+</code></pre>
+
+=====
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+.............urlA..........urlB..................
+
+[urlA]
+{
+    start: 'Integer',
+    url: 'String',    // -> urlA
+    fullUrl: 'String'  // www.example.com -> http://www.example.com
+    length: 'Integer' // url.length
+}
+
+</code></pre>
+
+=====
+##新思路
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+
+Plain Text
+
+.............urlA..........urlB..................
+
+HTML
+
++++++++++++++[urlA]++++++++++[urlB]+++++++++++++++++
+
+</code></pre>
+
+
+=====
+
+<p style="text-align:center;"><img src="./plainText/quan.jpg"></p>
+
+=====
+##新思路
+
+[演示](http://fuyg.youdao.com/youdao/htmlize/trunk/test/test_debug.html)
+
+=====
+##新思路
+
+https://github.com/FuDesign2008/htmlize
+
+=====
+#Thank You
+
+=====
+##提问
+
+<pre><code class="language-javascript" style="font-size: 80%;">
+给一个url地址, 如何创建一个`a`标签的合法HTML
+* 使用纯粹文本处理方法
+
+var linkHTML = function (url) {
+    var element = document.create('a');
+    element.setAttribute('href', url);
+    element.innerText = url;
+    return element.outerHTML;
+}
+
+</code></pre>
+
+
+
