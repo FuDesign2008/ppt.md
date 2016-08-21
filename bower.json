@@ -1,0 +1,27 @@
+{
+  "name": "ppt.md",
+  "homepage": "https://github.com/FuDesign2008/ppt.md",
+  "authors": [
+    "fudesign2008 <fudesign2008@163.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "impress-js": "impress.js#^0.6.0",
+    "marked": "^0.3.6",
+    "prism": "^1.5.1",
+    "deck.js": "^1.1.0"
+  },
+  "devDependencies": {
+    "jquery": "^3.1.0"
+  }
+}

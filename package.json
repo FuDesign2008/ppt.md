@@ -1,0 +1,23 @@
+{
+  "name": "ppt.md",
+  "version": "1.0.0",
+  "description": "Talks List =========== http://fudesign2008.github.io/ppt.md/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FuDesign2008/ppt.md.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FuDesign2008/ppt.md/issues"
+  },
+  "homepage": "https://github.com/FuDesign2008/ppt.md#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1"
+  }
+}
