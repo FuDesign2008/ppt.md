@@ -14,7 +14,7 @@
 * htmlParse.js 是一个对html内容进行处理, 使得内容符合xhtml规范的引擎.
 通过配置规则, 可以使得内容符合特定xhtml规范子集.
 
-![whole progress](./html_image/whole_progress.jpg)
+![whole progress](./images/whole_progress.jpg)
 =====
 ## Why htmlParser.js
 * 云笔记的内容是以html富文本格式存储的
@@ -47,7 +47,7 @@
 ## Why htmlParser.js
 * 不合理的内容影响编辑器对内容处理和用户的编辑体验
 
-![absolute.png](html_image/absolute.png)
+![absolute.png](./images/absolute.png)
 
 =====
 # 过滤HTML!
@@ -195,7 +195,7 @@
 =====
 ## 递归
 
-![digui.png](html_image/digui.png)
+![digui.png](./images/digui.png)
 =====
 ## htmlParser.js
 * [test page](http://fuyg.youdao.com/youdao/htmlParser/trunk/test/qunit_test_debug.html?filter=parser%2Fparse)

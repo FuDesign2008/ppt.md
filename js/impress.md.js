@@ -3,7 +3,9 @@
         $ = window.jQuery,
         impress = window.impress,
         marked = window.marked,
-        PPT_CONFIG = window.PPT_CONFIG,
+        PPT_CONFIG = window.PPT_CONFIG || {
+            mdPath: 'ppt.md'
+        },
         SPLITER = '=====',
         mdPath,
         tmplId = 'ppt_item_tmpl',
@@ -61,17 +63,10 @@
             $('#impress').html(contents);
             // initialize ppt
             impress().init();
-            if (window.Prism) {
+            if (window.hljs) {
                 $('pre', document.body).each(function (index, pre) {
-                    var code = $('>code', pre).get(0);
-                    if (!code) {
-                        return;
-                    }
-                    if (code.className.indexOf('language') > -1) {
-                        window.Prism.highlightElement(code);
-                    }
+                    window.hljs.highlightBlock(pre);
                 });
-
             }
         }, 'text');
     });

@@ -9,842 +9,1570 @@ if(e&&1===a.nodeType)while(c=e[d++])a.removeAttribute(c)}}),hb={set:function(a,b
  * https://github.com/chjj/marked
  */
 (function(){var block={newline:/^\n+/,code:/^( {4}[^\n]+\n*)+/,fences:noop,hr:/^( *[-*_]){3,} *(?:\n+|$)/,heading:/^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,nptable:noop,lheading:/^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,blockquote:/^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,list:/^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,html:/^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,table:noop,paragraph:/^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,text:/^[^\n]+/};block.bullet=/(?:[*+-]|\d+\.)/;block.item=/^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;block.item=replace(block.item,"gm")(/bull/g,block.bullet)();block.list=replace(block.list)(/bull/g,block.bullet)("hr","\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))")("def","\\n+(?="+block.def.source+")")();block.blockquote=replace(block.blockquote)("def",block.def)();block._tag="(?!(?:"+"a|em|strong|small|s|cite|q|dfn|abbr|data|time|code"+"|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo"+"|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b";block.html=replace(block.html)("comment",/<!--[\s\S]*?-->/)("closed",/<(tag)[\s\S]+?<\/\1>/)("closing",/<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)(/tag/g,block._tag)();block.paragraph=replace(block.paragraph)("hr",block.hr)("heading",block.heading)("lheading",block.lheading)("blockquote",block.blockquote)("tag","<"+block._tag)("def",block.def)();block.normal=merge({},block);block.gfm=merge({},block.normal,{fences:/^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,paragraph:/^/,heading:/^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/});block.gfm.paragraph=replace(block.paragraph)("(?!","(?!"+block.gfm.fences.source.replace("\\1","\\2")+"|"+block.list.source.replace("\\1","\\3")+"|")();block.tables=merge({},block.gfm,{nptable:/^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,table:/^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/});function Lexer(options){this.tokens=[];this.tokens.links={};this.options=options||marked.defaults;this.rules=block.normal;if(this.options.gfm){if(this.options.tables){this.rules=block.tables}else{this.rules=block.gfm}}}Lexer.rules=block;Lexer.lex=function(src,options){var lexer=new Lexer(options);return lexer.lex(src)};Lexer.prototype.lex=function(src){src=src.replace(/\r\n|\r/g,"\n").replace(/\t/g,"    ").replace(/\u00a0/g," ").replace(/\u2424/g,"\n");return this.token(src,true)};Lexer.prototype.token=function(src,top,bq){var src=src.replace(/^ +$/gm,""),next,loose,cap,bull,b,item,space,i,l;while(src){if(cap=this.rules.newline.exec(src)){src=src.substring(cap[0].length);if(cap[0].length>1){this.tokens.push({type:"space"})}}if(cap=this.rules.code.exec(src)){src=src.substring(cap[0].length);cap=cap[0].replace(/^ {4}/gm,"");this.tokens.push({type:"code",text:!this.options.pedantic?cap.replace(/\n+$/,""):cap});continue}if(cap=this.rules.fences.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"code",lang:cap[2],text:cap[3]||""});continue}if(cap=this.rules.heading.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"heading",depth:cap[1].length,text:cap[2]});continue}if(top&&(cap=this.rules.nptable.exec(src))){src=src.substring(cap[0].length);item={type:"table",header:cap[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:cap[2].replace(/^ *|\| *$/g,"").split(/ *\| */),cells:cap[3].replace(/\n$/,"").split("\n")};for(i=0;i<item.align.length;i++){if(/^ *-+: *$/.test(item.align[i])){item.align[i]="right"}else if(/^ *:-+: *$/.test(item.align[i])){item.align[i]="center"}else if(/^ *:-+ *$/.test(item.align[i])){item.align[i]="left"}else{item.align[i]=null}}for(i=0;i<item.cells.length;i++){item.cells[i]=item.cells[i].split(/ *\| */)}this.tokens.push(item);continue}if(cap=this.rules.lheading.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"heading",depth:cap[2]==="="?1:2,text:cap[1]});continue}if(cap=this.rules.hr.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"hr"});continue}if(cap=this.rules.blockquote.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"blockquote_start"});cap=cap[0].replace(/^ *> ?/gm,"");this.token(cap,top,true);this.tokens.push({type:"blockquote_end"});continue}if(cap=this.rules.list.exec(src)){src=src.substring(cap[0].length);bull=cap[2];this.tokens.push({type:"list_start",ordered:bull.length>1});cap=cap[0].match(this.rules.item);next=false;l=cap.length;i=0;for(;i<l;i++){item=cap[i];space=item.length;item=item.replace(/^ *([*+-]|\d+\.) +/,"");if(~item.indexOf("\n ")){space-=item.length;item=!this.options.pedantic?item.replace(new RegExp("^ {1,"+space+"}","gm"),""):item.replace(/^ {1,4}/gm,"")}if(this.options.smartLists&&i!==l-1){b=block.bullet.exec(cap[i+1])[0];if(bull!==b&&!(bull.length>1&&b.length>1)){src=cap.slice(i+1).join("\n")+src;i=l-1}}loose=next||/\n\n(?!\s*$)/.test(item);if(i!==l-1){next=item.charAt(item.length-1)==="\n";if(!loose)loose=next}this.tokens.push({type:loose?"loose_item_start":"list_item_start"});this.token(item,false,bq);this.tokens.push({type:"list_item_end"})}this.tokens.push({type:"list_end"});continue}if(cap=this.rules.html.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:this.options.sanitize?"paragraph":"html",pre:!this.options.sanitizer&&(cap[1]==="pre"||cap[1]==="script"||cap[1]==="style"),text:cap[0]});continue}if(!bq&&top&&(cap=this.rules.def.exec(src))){src=src.substring(cap[0].length);this.tokens.links[cap[1].toLowerCase()]={href:cap[2],title:cap[3]};continue}if(top&&(cap=this.rules.table.exec(src))){src=src.substring(cap[0].length);item={type:"table",header:cap[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:cap[2].replace(/^ *|\| *$/g,"").split(/ *\| */),cells:cap[3].replace(/(?: *\| *)?\n$/,"").split("\n")};for(i=0;i<item.align.length;i++){if(/^ *-+: *$/.test(item.align[i])){item.align[i]="right"}else if(/^ *:-+: *$/.test(item.align[i])){item.align[i]="center"}else if(/^ *:-+ *$/.test(item.align[i])){item.align[i]="left"}else{item.align[i]=null}}for(i=0;i<item.cells.length;i++){item.cells[i]=item.cells[i].replace(/^ *\| *| *\| *$/g,"").split(/ *\| */)}this.tokens.push(item);continue}if(top&&(cap=this.rules.paragraph.exec(src))){src=src.substring(cap[0].length);this.tokens.push({type:"paragraph",text:cap[1].charAt(cap[1].length-1)==="\n"?cap[1].slice(0,-1):cap[1]});continue}if(cap=this.rules.text.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"text",text:cap[0]});continue}if(src){throw new Error("Infinite loop on byte: "+src.charCodeAt(0))}}return this.tokens};var inline={escape:/^\\([\\`*{}\[\]()#+\-.!_>])/,autolink:/^<([^ >]+(@|:\/)[^ >]+)>/,url:noop,tag:/^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,link:/^!?\[(inside)\]\(href\)/,reflink:/^!?\[(inside)\]\s*\[([^\]]*)\]/,nolink:/^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,strong:/^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,em:/^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,code:/^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,br:/^ {2,}\n(?!\s*$)/,del:noop,text:/^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/};inline._inside=/(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;inline._href=/\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;inline.link=replace(inline.link)("inside",inline._inside)("href",inline._href)();inline.reflink=replace(inline.reflink)("inside",inline._inside)();inline.normal=merge({},inline);inline.pedantic=merge({},inline.normal,{strong:/^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,em:/^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/});inline.gfm=merge({},inline.normal,{escape:replace(inline.escape)("])","~|])")(),url:/^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,del:/^~~(?=\S)([\s\S]*?\S)~~/,text:replace(inline.text)("]|","~]|")("|","|https?://|")()});inline.breaks=merge({},inline.gfm,{br:replace(inline.br)("{2,}","*")(),text:replace(inline.gfm.text)("{2,}","*")()});function InlineLexer(links,options){this.options=options||marked.defaults;this.links=links;this.rules=inline.normal;this.renderer=this.options.renderer||new Renderer;this.renderer.options=this.options;if(!this.links){throw new Error("Tokens array requires a `links` property.")}if(this.options.gfm){if(this.options.breaks){this.rules=inline.breaks}else{this.rules=inline.gfm}}else if(this.options.pedantic){this.rules=inline.pedantic}}InlineLexer.rules=inline;InlineLexer.output=function(src,links,options){var inline=new InlineLexer(links,options);return inline.output(src)};InlineLexer.prototype.output=function(src){var out="",link,text,href,cap;while(src){if(cap=this.rules.escape.exec(src)){src=src.substring(cap[0].length);out+=cap[1];continue}if(cap=this.rules.autolink.exec(src)){src=src.substring(cap[0].length);if(cap[2]==="@"){text=cap[1].charAt(6)===":"?this.mangle(cap[1].substring(7)):this.mangle(cap[1]);href=this.mangle("mailto:")+text}else{text=escape(cap[1]);href=text}out+=this.renderer.link(href,null,text);continue}if(!this.inLink&&(cap=this.rules.url.exec(src))){src=src.substring(cap[0].length);text=escape(cap[1]);href=text;out+=this.renderer.link(href,null,text);continue}if(cap=this.rules.tag.exec(src)){if(!this.inLink&&/^<a /i.test(cap[0])){this.inLink=true}else if(this.inLink&&/^<\/a>/i.test(cap[0])){this.inLink=false}src=src.substring(cap[0].length);out+=this.options.sanitize?this.options.sanitizer?this.options.sanitizer(cap[0]):escape(cap[0]):cap[0];continue}if(cap=this.rules.link.exec(src)){src=src.substring(cap[0].length);this.inLink=true;out+=this.outputLink(cap,{href:cap[2],title:cap[3]});this.inLink=false;continue}if((cap=this.rules.reflink.exec(src))||(cap=this.rules.nolink.exec(src))){src=src.substring(cap[0].length);link=(cap[2]||cap[1]).replace(/\s+/g," ");link=this.links[link.toLowerCase()];if(!link||!link.href){out+=cap[0].charAt(0);src=cap[0].substring(1)+src;continue}this.inLink=true;out+=this.outputLink(cap,link);this.inLink=false;continue}if(cap=this.rules.strong.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.strong(this.output(cap[2]||cap[1]));continue}if(cap=this.rules.em.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.em(this.output(cap[2]||cap[1]));continue}if(cap=this.rules.code.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.codespan(escape(cap[2],true));continue}if(cap=this.rules.br.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.br();continue}if(cap=this.rules.del.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.del(this.output(cap[1]));continue}if(cap=this.rules.text.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.text(escape(this.smartypants(cap[0])));continue}if(src){throw new Error("Infinite loop on byte: "+src.charCodeAt(0))}}return out};InlineLexer.prototype.outputLink=function(cap,link){var href=escape(link.href),title=link.title?escape(link.title):null;return cap[0].charAt(0)!=="!"?this.renderer.link(href,title,this.output(cap[1])):this.renderer.image(href,title,escape(cap[1]))};InlineLexer.prototype.smartypants=function(text){if(!this.options.smartypants)return text;return text.replace(/---/g,"—").replace(/--/g,"–").replace(/(^|[-\u2014/(\[{"\s])'/g,"$1‘").replace(/'/g,"’").replace(/(^|[-\u2014/(\[{\u2018\s])"/g,"$1“").replace(/"/g,"”").replace(/\.{3}/g,"…")};InlineLexer.prototype.mangle=function(text){if(!this.options.mangle)return text;var out="",l=text.length,i=0,ch;for(;i<l;i++){ch=text.charCodeAt(i);if(Math.random()>.5){ch="x"+ch.toString(16)}out+="&#"+ch+";"}return out};function Renderer(options){this.options=options||{}}Renderer.prototype.code=function(code,lang,escaped){if(this.options.highlight){var out=this.options.highlight(code,lang);if(out!=null&&out!==code){escaped=true;code=out}}if(!lang){return"<pre><code>"+(escaped?code:escape(code,true))+"\n</code></pre>"}return'<pre><code class="'+this.options.langPrefix+escape(lang,true)+'">'+(escaped?code:escape(code,true))+"\n</code></pre>\n"};Renderer.prototype.blockquote=function(quote){return"<blockquote>\n"+quote+"</blockquote>\n"};Renderer.prototype.html=function(html){return html};Renderer.prototype.heading=function(text,level,raw){return"<h"+level+' id="'+this.options.headerPrefix+raw.toLowerCase().replace(/[^\w]+/g,"-")+'">'+text+"</h"+level+">\n"};Renderer.prototype.hr=function(){return this.options.xhtml?"<hr/>\n":"<hr>\n"};Renderer.prototype.list=function(body,ordered){var type=ordered?"ol":"ul";return"<"+type+">\n"+body+"</"+type+">\n"};Renderer.prototype.listitem=function(text){return"<li>"+text+"</li>\n"};Renderer.prototype.paragraph=function(text){return"<p>"+text+"</p>\n"};Renderer.prototype.table=function(header,body){return"<table>\n"+"<thead>\n"+header+"</thead>\n"+"<tbody>\n"+body+"</tbody>\n"+"</table>\n"};Renderer.prototype.tablerow=function(content){return"<tr>\n"+content+"</tr>\n"};Renderer.prototype.tablecell=function(content,flags){var type=flags.header?"th":"td";var tag=flags.align?"<"+type+' style="text-align:'+flags.align+'">':"<"+type+">";return tag+content+"</"+type+">\n"};Renderer.prototype.strong=function(text){return"<strong>"+text+"</strong>"};Renderer.prototype.em=function(text){return"<em>"+text+"</em>"};Renderer.prototype.codespan=function(text){return"<code>"+text+"</code>"};Renderer.prototype.br=function(){return this.options.xhtml?"<br/>":"<br>"};Renderer.prototype.del=function(text){return"<del>"+text+"</del>"};Renderer.prototype.link=function(href,title,text){if(this.options.sanitize){try{var prot=decodeURIComponent(unescape(href)).replace(/[^\w:]/g,"").toLowerCase()}catch(e){return""}if(prot.indexOf("javascript:")===0||prot.indexOf("vbscript:")===0){return""}}var out='<a href="'+href+'"';if(title){out+=' title="'+title+'"'}out+=">"+text+"</a>";return out};Renderer.prototype.image=function(href,title,text){var out='<img src="'+href+'" alt="'+text+'"';if(title){out+=' title="'+title+'"'}out+=this.options.xhtml?"/>":">";return out};Renderer.prototype.text=function(text){return text};function Parser(options){this.tokens=[];this.token=null;this.options=options||marked.defaults;this.options.renderer=this.options.renderer||new Renderer;this.renderer=this.options.renderer;this.renderer.options=this.options}Parser.parse=function(src,options,renderer){var parser=new Parser(options,renderer);return parser.parse(src)};Parser.prototype.parse=function(src){this.inline=new InlineLexer(src.links,this.options,this.renderer);this.tokens=src.reverse();var out="";while(this.next()){out+=this.tok()}return out};Parser.prototype.next=function(){return this.token=this.tokens.pop()};Parser.prototype.peek=function(){return this.tokens[this.tokens.length-1]||0};Parser.prototype.parseText=function(){var body=this.token.text;while(this.peek().type==="text"){body+="\n"+this.next().text}return this.inline.output(body)};Parser.prototype.tok=function(){switch(this.token.type){case"space":{return""}case"hr":{return this.renderer.hr()}case"heading":{return this.renderer.heading(this.inline.output(this.token.text),this.token.depth,this.token.text)}case"code":{return this.renderer.code(this.token.text,this.token.lang,this.token.escaped)}case"table":{var header="",body="",i,row,cell,flags,j;cell="";for(i=0;i<this.token.header.length;i++){flags={header:true,align:this.token.align[i]};cell+=this.renderer.tablecell(this.inline.output(this.token.header[i]),{header:true,align:this.token.align[i]})}header+=this.renderer.tablerow(cell);for(i=0;i<this.token.cells.length;i++){row=this.token.cells[i];cell="";for(j=0;j<row.length;j++){cell+=this.renderer.tablecell(this.inline.output(row[j]),{header:false,align:this.token.align[j]})}body+=this.renderer.tablerow(cell)}return this.renderer.table(header,body)}case"blockquote_start":{var body="";while(this.next().type!=="blockquote_end"){body+=this.tok()}return this.renderer.blockquote(body)}case"list_start":{var body="",ordered=this.token.ordered;while(this.next().type!=="list_end"){body+=this.tok()}return this.renderer.list(body,ordered)}case"list_item_start":{var body="";while(this.next().type!=="list_item_end"){body+=this.token.type==="text"?this.parseText():this.tok()}return this.renderer.listitem(body)}case"loose_item_start":{var body="";while(this.next().type!=="list_item_end"){body+=this.tok()}return this.renderer.listitem(body)}case"html":{var html=!this.token.pre&&!this.options.pedantic?this.inline.output(this.token.text):this.token.text;return this.renderer.html(html)}case"paragraph":{return this.renderer.paragraph(this.inline.output(this.token.text))}case"text":{return this.renderer.paragraph(this.parseText())}}};function escape(html,encode){return html.replace(!encode?/&(?!#?\w+;)/g:/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function unescape(html){return html.replace(/&([#\w]+);/g,function(_,n){n=n.toLowerCase();if(n==="colon")return":";if(n.charAt(0)==="#"){return n.charAt(1)==="x"?String.fromCharCode(parseInt(n.substring(2),16)):String.fromCharCode(+n.substring(1))}return""})}function replace(regex,opt){regex=regex.source;opt=opt||"";return function self(name,val){if(!name)return new RegExp(regex,opt);val=val.source||val;val=val.replace(/(^|[^\[])\^/g,"$1");regex=regex.replace(name,val);return self}}function noop(){}noop.exec=noop;function merge(obj){var i=1,target,key;for(;i<arguments.length;i++){target=arguments[i];for(key in target){if(Object.prototype.hasOwnProperty.call(target,key)){obj[key]=target[key]}}}return obj}function marked(src,opt,callback){if(callback||typeof opt==="function"){if(!callback){callback=opt;opt=null}opt=merge({},marked.defaults,opt||{});var highlight=opt.highlight,tokens,pending,i=0;try{tokens=Lexer.lex(src,opt)}catch(e){return callback(e)}pending=tokens.length;var done=function(err){if(err){opt.highlight=highlight;return callback(err)}var out;try{out=Parser.parse(tokens,opt)}catch(e){err=e}opt.highlight=highlight;return err?callback(err):callback(null,out)};if(!highlight||highlight.length<3){return done()}delete opt.highlight;if(!pending)return done();for(;i<tokens.length;i++){(function(token){if(token.type!=="code"){return--pending||done()}return highlight(token.text,token.lang,function(err,code){if(err)return done(err);if(code==null||code===token.text){return--pending||done()}token.text=code;token.escaped=true;--pending||done()})})(tokens[i])}return}try{if(opt)opt=merge({},marked.defaults,opt);return Parser.parse(Lexer.lex(src,opt),opt)}catch(e){e.message+="\nPlease report this to https://github.com/chjj/marked.";if((opt||marked.defaults).silent){return"<p>An error occured:</p><pre>"+escape(e.message+"",true)+"</pre>"}throw e}}marked.options=marked.setOptions=function(opt){merge(marked.defaults,opt);return marked};marked.defaults={gfm:true,tables:true,breaks:false,pedantic:false,sanitize:false,sanitizer:null,mangle:true,smartLists:false,silent:false,highlight:null,langPrefix:"lang-",smartypants:false,headerPrefix:"",renderer:new Renderer,xhtml:false};marked.Parser=Parser;marked.parser=Parser.parse;marked.Renderer=Renderer;marked.Lexer=Lexer;marked.lexer=Lexer.lex;marked.InlineLexer=InlineLexer;marked.inlineLexer=InlineLexer.output;marked.parse=marked;if(typeof module!=="undefined"&&typeof exports==="object"){module.exports=marked}else if(typeof define==="function"&&define.amd){define(function(){return marked})}else{this.marked=marked}}).call(function(){return this||(typeof window!=="undefined"?window:global)}());
-/**
- * impress.js
- *
- * impress.js is a presentation tool based on the power of CSS3 transforms and transitions
- * in modern browsers and inspired by the idea behind prezi.com.
- *
- *
- * Copyright 2011-2012 Bartek Szopka (@bartaz)
- *
- * Released under the MIT and GPL Licenses.
- *
- * ------------------------------------------------
- *  author:  Bartek Szopka
- *  version: 0.5.3
- *  url:     http://bartaz.github.com/impress.js/
- *  source:  http://github.com/bartaz/impress.js/
+/* Modernizr 2.0.6 (Custom Build) | MIT & BSD
+ * Contains: fontface | backgroundsize | borderimage | borderradius | boxshadow | flexbox | hsla | multiplebgs | opacity | rgba | textshadow | cssanimations | csscolumns | generatedcontent | cssgradients | cssreflections | csstransforms | csstransforms3d | csstransitions | applicationcache | canvas | canvastext | draganddrop | hashchange | history | audio | video | indexeddb | input | inputtypes | localstorage | postmessage | sessionstorage | websockets | websqldatabase | webworkers | geolocation | inlinesvg | smil | svg | svgclippaths | touch | webgl | iepp | cssclasses | addtest | teststyles | testprop | testallprops | hasevent | prefixes | domprefixes | load
  */
+;window.Modernizr=function(a,b,c){function H(){e.input=function(a){for(var b=0,c=a.length;b<c;b++)t[a[b]]=a[b]in l;return t}("autocomplete autofocus list placeholder max min multiple pattern required step".split(" ")),e.inputtypes=function(a){for(var d=0,e,f,h,i=a.length;d<i;d++)l.setAttribute("type",f=a[d]),e=l.type!=="text",e&&(l.value=m,l.style.cssText="position:absolute;visibility:hidden;",/^range$/.test(f)&&l.style.WebkitAppearance!==c?(g.appendChild(l),h=b.defaultView,e=h.getComputedStyle&&h.getComputedStyle(l,null).WebkitAppearance!=="textfield"&&l.offsetHeight!==0,g.removeChild(l)):/^(search|tel)$/.test(f)||(/^(url|email)$/.test(f)?e=l.checkValidity&&l.checkValidity()===!1:/^color$/.test(f)?(g.appendChild(l),g.offsetWidth,e=l.value!=m,g.removeChild(l)):e=l.value!=m)),s[a[d]]=!!e;return s}("search tel url email datetime date month week time datetime-local number range color".split(" "))}function F(a,b){var c=a.charAt(0).toUpperCase()+a.substr(1),d=(a+" "+p.join(c+" ")+c).split(" ");return E(d,b)}function E(a,b){for(var d in a)if(k[a[d]]!==c)return b=="pfx"?a[d]:!0;return!1}function D(a,b){return!!~(""+a).indexOf(b)}function C(a,b){return typeof a===b}function B(a,b){return A(o.join(a+";")+(b||""))}function A(a){k.cssText=a}var d="2.0.6",e={},f=!0,g=b.documentElement,h=b.head||b.getElementsByTagName("head")[0],i="modernizr",j=b.createElement(i),k=j.style,l=b.createElement("input"),m=":)",n=Object.prototype.toString,o=" -webkit- -moz- -o- -ms- -khtml- ".split(" "),p="Webkit Moz O ms Khtml".split(" "),q={svg:"http://www.w3.org/2000/svg"},r={},s={},t={},u=[],v=function(a,c,d,e){var f,h,j,k=b.createElement("div");if(parseInt(d,10))while(d--)j=b.createElement("div"),j.id=e?e[d]:i+(d+1),k.appendChild(j);f=["&shy;","<style>",a,"</style>"].join(""),k.id=i,k.innerHTML+=f,g.appendChild(k),h=c(k,a),k.parentNode.removeChild(k);return!!h},w=function(){function d(d,e){e=e||b.createElement(a[d]||"div"),d="on"+d;var f=d in e;f||(e.setAttribute||(e=b.createElement("div")),e.setAttribute&&e.removeAttribute&&(e.setAttribute(d,""),f=C(e[d],"function"),C(e[d],c)||(e[d]=c),e.removeAttribute(d))),e=null;return f}var a={select:"input",change:"input",submit:"form",reset:"form",error:"img",load:"img",abort:"img"};return d}(),x,y={}.hasOwnProperty,z;!C(y,c)&&!C(y.call,c)?z=function(a,b){return y.call(a,b)}:z=function(a,b){return b in a&&C(a.constructor.prototype[b],c)};var G=function(c,d){var f=c.join(""),g=d.length;v(f,function(c,d){var f=b.styleSheets[b.styleSheets.length-1],h=f.cssRules&&f.cssRules[0]?f.cssRules[0].cssText:f.cssText||"",i=c.childNodes,j={};while(g--)j[i[g].id]=i[g];e.touch="ontouchstart"in a||j.touch.offsetTop===9,e.csstransforms3d=j.csstransforms3d.offsetLeft===9,e.generatedcontent=j.generatedcontent.offsetHeight>=1,e.fontface=/src/i.test(h)&&h.indexOf(d.split(" ")[0])===0},g,d)}(['@font-face {font-family:"font";src:url("https://")}',["@media (",o.join("touch-enabled),("),i,")","{#touch{top:9px;position:absolute}}"].join(""),["@media (",o.join("transform-3d),("),i,")","{#csstransforms3d{left:9px;position:absolute}}"].join(""),['#generatedcontent:after{content:"',m,'";visibility:hidden}'].join("")],["fontface","touch","csstransforms3d","generatedcontent"]);r.flexbox=function(){function c(a,b,c,d){a.style.cssText=o.join(b+":"+c+";")+(d||"")}function a(a,b,c,d){b+=":",a.style.cssText=(b+o.join(c+";"+b)).slice(0,-b.length)+(d||"")}var d=b.createElement("div"),e=b.createElement("div");a(d,"display","box","width:42px;padding:0;"),c(e,"box-flex","1","width:10px;"),d.appendChild(e),g.appendChild(d);var f=e.offsetWidth===42;d.removeChild(e),g.removeChild(d);return f},r.canvas=function(){var a=b.createElement("canvas");return!!a.getContext&&!!a.getContext("2d")},r.canvastext=function(){return!!e.canvas&&!!C(b.createElement("canvas").getContext("2d").fillText,"function")},r.webgl=function(){return!!a.WebGLRenderingContext},r.touch=function(){return e.touch},r.geolocation=function(){return!!navigator.geolocation},r.postmessage=function(){return!!a.postMessage},r.websqldatabase=function(){var b=!!a.openDatabase;return b},r.indexedDB=function(){for(var b=-1,c=p.length;++b<c;)if(a[p[b].toLowerCase()+"IndexedDB"])return!0;return!!a.indexedDB},r.hashchange=function(){return w("hashchange",a)&&(b.documentMode===c||b.documentMode>7)},r.history=function(){return!!a.history&&!!history.pushState},r.draganddrop=function(){return w("dragstart")&&w("drop")},r.websockets=function(){for(var b=-1,c=p.length;++b<c;)if(a[p[b]+"WebSocket"])return!0;return"WebSocket"in a},r.rgba=function(){A("background-color:rgba(150,255,150,.5)");return D(k.backgroundColor,"rgba")},r.hsla=function(){A("background-color:hsla(120,40%,100%,.5)");return D(k.backgroundColor,"rgba")||D(k.backgroundColor,"hsla")},r.multiplebgs=function(){A("background:url(https://),url(https://),red url(https://)");return/(url\s*\(.*?){3}/.test(k.background)},r.backgroundsize=function(){return F("backgroundSize")},r.borderimage=function(){return F("borderImage")},r.borderradius=function(){return F("borderRadius")},r.boxshadow=function(){return F("boxShadow")},r.textshadow=function(){return b.createElement("div").style.textShadow===""},r.opacity=function(){B("opacity:.55");return/^0.55$/.test(k.opacity)},r.cssanimations=function(){return F("animationName")},r.csscolumns=function(){return F("columnCount")},r.cssgradients=function(){var a="background-image:",b="gradient(linear,left top,right bottom,from(#9f9),to(white));",c="linear-gradient(left top,#9f9, white);";A((a+o.join(b+a)+o.join(c+a)).slice(0,-a.length));return D(k.backgroundImage,"gradient")},r.cssreflections=function(){return F("boxReflect")},r.csstransforms=function(){return!!E(["transformProperty","WebkitTransform","MozTransform","OTransform","msTransform"])},r.csstransforms3d=function(){var a=!!E(["perspectiveProperty","WebkitPerspective","MozPerspective","OPerspective","msPerspective"]);a&&"webkitPerspective"in g.style&&(a=e.csstransforms3d);return a},r.csstransitions=function(){return F("transitionProperty")},r.fontface=function(){return e.fontface},r.generatedcontent=function(){return e.generatedcontent},r.video=function(){var a=b.createElement("video"),c=!1;try{if(c=!!a.canPlayType){c=new Boolean(c),c.ogg=a.canPlayType('video/ogg; codecs="theora"');var d='video/mp4; codecs="avc1.42E01E';c.h264=a.canPlayType(d+'"')||a.canPlayType(d+', mp4a.40.2"'),c.webm=a.canPlayType('video/webm; codecs="vp8, vorbis"')}}catch(e){}return c},r.audio=function(){var a=b.createElement("audio"),c=!1;try{if(c=!!a.canPlayType)c=new Boolean(c),c.ogg=a.canPlayType('audio/ogg; codecs="vorbis"'),c.mp3=a.canPlayType("audio/mpeg;"),c.wav=a.canPlayType('audio/wav; codecs="1"'),c.m4a=a.canPlayType("audio/x-m4a;")||a.canPlayType("audio/aac;")}catch(d){}return c},r.localstorage=function(){try{return!!localStorage.getItem}catch(a){return!1}},r.sessionstorage=function(){try{return!!sessionStorage.getItem}catch(a){return!1}},r.webworkers=function(){return!!a.Worker},r.applicationcache=function(){return!!a.applicationCache},r.svg=function(){return!!b.createElementNS&&!!b.createElementNS(q.svg,"svg").createSVGRect},r.inlinesvg=function(){var a=b.createElement("div");a.innerHTML="<svg/>";return(a.firstChild&&a.firstChild.namespaceURI)==q.svg},r.smil=function(){return!!b.createElementNS&&/SVG/.test(n.call(b.createElementNS(q.svg,"animate")))},r.svgclippaths=function(){return!!b.createElementNS&&/SVG/.test(n.call(b.createElementNS(q.svg,"clipPath")))};for(var I in r)z(r,I)&&(x=I.toLowerCase(),e[x]=r[I](),u.push((e[x]?"":"no-")+x));e.input||H(),e.addTest=function(a,b){if(typeof a=="object")for(var d in a)z(a,d)&&e.addTest(d,a[d]);else{a=a.toLowerCase();if(e[a]!==c)return;b=typeof b=="boolean"?b:!!b(),g.className+=" "+(b?"":"no-")+a,e[a]=b}return e},A(""),j=l=null,a.attachEvent&&function(){var a=b.createElement("div");a.innerHTML="<elem></elem>";return a.childNodes.length!==1}()&&function(a,b){function s(a){var b=-1;while(++b<g)a.createElement(f[b])}a.iepp=a.iepp||{};var d=a.iepp,e=d.html5elements||"abbr|article|aside|audio|canvas|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",f=e.split("|"),g=f.length,h=new RegExp("(^|\\s)("+e+")","gi"),i=new RegExp("<(/*)("+e+")","gi"),j=/^\s*[\{\}]\s*$/,k=new RegExp("(^|[^\\n]*?\\s)("+e+")([^\\n]*)({[\\n\\w\\W]*?})","gi"),l=b.createDocumentFragment(),m=b.documentElement,n=m.firstChild,o=b.createElement("body"),p=b.createElement("style"),q=/print|all/,r;d.getCSS=function(a,b){if(a+""===c)return"";var e=-1,f=a.length,g,h=[];while(++e<f){g=a[e];if(g.disabled)continue;b=g.media||b,q.test(b)&&h.push(d.getCSS(g.imports,b),g.cssText),b="all"}return h.join("")},d.parseCSS=function(a){var b=[],c;while((c=k.exec(a))!=null)b.push(((j.exec(c[1])?"\n":c[1])+c[2]+c[3]).replace(h,"$1.iepp_$2")+c[4]);return b.join("\n")},d.writeHTML=function(){var a=-1;r=r||b.body;while(++a<g){var c=b.getElementsByTagName(f[a]),d=c.length,e=-1;while(++e<d)c[e].className.indexOf("iepp_")<0&&(c[e].className+=" iepp_"+f[a])}l.appendChild(r),m.appendChild(o),o.className=r.className,o.id=r.id,o.innerHTML=r.innerHTML.replace(i,"<$1font")},d._beforePrint=function(){p.styleSheet.cssText=d.parseCSS(d.getCSS(b.styleSheets,"all")),d.writeHTML()},d.restoreHTML=function(){o.innerHTML="",m.removeChild(o),m.appendChild(r)},d._afterPrint=function(){d.restoreHTML(),p.styleSheet.cssText=""},s(b),s(l);d.disablePP||(n.insertBefore(p,n.firstChild),p.media="print",p.className="iepp-printshim",a.attachEvent("onbeforeprint",d._beforePrint),a.attachEvent("onafterprint",d._afterPrint))}(a,b),e._version=d,e._prefixes=o,e._domPrefixes=p,e.hasEvent=w,e.testProp=function(a){return E([a])},e.testAllProps=F,e.testStyles=v,g.className=g.className.replace(/\bno-js\b/,"")+(f?" js "+u.join(" "):"");return e}(this,this.document),function(a,b,c){function k(a){return!a||a=="loaded"||a=="complete"}function j(){var a=1,b=-1;while(p.length- ++b)if(p[b].s&&!(a=p[b].r))break;a&&g()}function i(a){var c=b.createElement("script"),d;c.src=a.s,c.onreadystatechange=c.onload=function(){!d&&k(c.readyState)&&(d=1,j(),c.onload=c.onreadystatechange=null)},m(function(){d||(d=1,j())},H.errorTimeout),a.e?c.onload():n.parentNode.insertBefore(c,n)}function h(a){var c=b.createElement("link"),d;c.href=a.s,c.rel="stylesheet",c.type="text/css";if(!a.e&&(w||r)){var e=function(a){m(function(){if(!d)try{a.sheet.cssRules.length?(d=1,j()):e(a)}catch(b){b.code==1e3||b.message=="security"||b.message=="denied"?(d=1,m(function(){j()},0)):e(a)}},0)};e(c)}else c.onload=function(){d||(d=1,m(function(){j()},0))},a.e&&c.onload();m(function(){d||(d=1,j())},H.errorTimeout),!a.e&&n.parentNode.insertBefore(c,n)}function g(){var a=p.shift();q=1,a?a.t?m(function(){a.t=="c"?h(a):i(a)},0):(a(),j()):q=0}function f(a,c,d,e,f,h){function i(){!o&&k(l.readyState)&&(r.r=o=1,!q&&j(),l.onload=l.onreadystatechange=null,m(function(){u.removeChild(l)},0))}var l=b.createElement(a),o=0,r={t:d,s:c,e:h};l.src=l.data=c,!s&&(l.style.display="none"),l.width=l.height="0",a!="object"&&(l.type=d),l.onload=l.onreadystatechange=i,a=="img"?l.onerror=i:a=="script"&&(l.onerror=function(){r.e=r.r=1,g()}),p.splice(e,0,r),u.insertBefore(l,s?null:n),m(function(){o||(u.removeChild(l),r.r=r.e=o=1,j())},H.errorTimeout)}function e(a,b,c){var d=b=="c"?z:y;q=0,b=b||"j",C(a)?f(d,a,b,this.i++,l,c):(p.splice(this.i++,0,a),p.length==1&&g());return this}function d(){var a=H;a.loader={load:e,i:0};return a}var l=b.documentElement,m=a.setTimeout,n=b.getElementsByTagName("script")[0],o={}.toString,p=[],q=0,r="MozAppearance"in l.style,s=r&&!!b.createRange().compareNode,t=r&&!s,u=s?l:n.parentNode,v=a.opera&&o.call(a.opera)=="[object Opera]",w="webkitAppearance"in l.style,x=w&&"async"in b.createElement("script"),y=r?"object":v||x?"img":"script",z=w?"img":y,A=Array.isArray||function(a){return o.call(a)=="[object Array]"},B=function(a){return Object(a)===a},C=function(a){return typeof a=="string"},D=function(a){return o.call(a)=="[object Function]"},E=[],F={},G,H;H=function(a){function f(a){var b=a.split("!"),c=E.length,d=b.pop(),e=b.length,f={url:d,origUrl:d,prefixes:b},g,h;for(h=0;h<e;h++)g=F[b[h]],g&&(f=g(f));for(h=0;h<c;h++)f=E[h](f);return f}function e(a,b,e,g,h){var i=f(a),j=i.autoCallback;if(!i.bypass){b&&(b=D(b)?b:b[a]||b[g]||b[a.split("/").pop().split("?")[0]]);if(i.instead)return i.instead(a,b,e,g,h);e.load(i.url,i.forceCSS||!i.forceJS&&/css$/.test(i.url)?"c":c,i.noexec),(D(b)||D(j))&&e.load(function(){d(),b&&b(i.origUrl,h,g),j&&j(i.origUrl,h,g)})}}function b(a,b){function c(a){if(C(a))e(a,h,b,0,d);else if(B(a))for(i in a)a.hasOwnProperty(i)&&e(a[i],h,b,i,d)}var d=!!a.test,f=d?a.yep:a.nope,g=a.load||a.both,h=a.callback,i;c(f),c(g),a.complete&&b.load(a.complete)}var g,h,i=this.yepnope.loader;if(C(a))e(a,0,i,0);else if(A(a))for(g=0;g<a.length;g++)h=a[g],C(h)?e(h,0,i,0):A(h)?H(h):B(h)&&b(h,i);else B(a)&&b(a,i)},H.addPrefix=function(a,b){F[a]=b},H.addFilter=function(a){E.push(a)},H.errorTimeout=1e4,b.readyState==null&&b.addEventListener&&(b.readyState="loading",b.addEventListener("DOMContentLoaded",G=function(){b.removeEventListener("DOMContentLoaded",G,0),b.readyState="complete"},0)),a.yepnope=d()}(this,this.document),Modernizr.load=function(){yepnope.apply(window,[].slice.call(arguments,0))};
+/*!
+Deck JS - deck.core
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
 
-/*jshint bitwise:true, curly:true, eqeqeq:true, forin:true, latedef:true, newcap:true,
-         noarg:true, noempty:true, undef:true, strict:true, browser:true */
+/*
+The deck.core module provides all the basic functionality for creating and
+moving through a deck.  It does so by applying classes to indicate the state of
+the deck and its slides, allowing CSS to take care of the visual representation
+of each state.  It also provides methods for navigating the deck and inspecting
+its state, as well as basic key bindings for going to the next and previous
+slides.  More functionality is provided by wholly separate extension modules
+that use the API provided by core.
+*/
+(function($, undefined) {
+  var slides, currentIndex, $container, $fragmentLinks;
 
-// You are one of those who like to know how things work inside?
-// Let me show you the cogs that make impress.js run...
-( function( document, window ) {
-    "use strict";
+  var events = {
+    /*
+    This event fires at the beginning of a slide change, before the actual
+    change occurs. Its purpose is to give extension authors a way to prevent
+    the slide change from occuring. This is done by calling preventDefault
+    on the event object within this event. If that is done, the deck.change
+    event will never be fired and the slide will not change.
+    */
+    beforeChange: 'deck.beforeChange',
 
-    // HELPER FUNCTIONS
+    /*
+    This event fires whenever the current slide changes, whether by way of
+    next, prev, or go. The callback function is passed two parameters, from
+    and to, equal to the indices of the old slide and the new slide
+    respectively. If preventDefault is called on the event within this handler
+    the slide change does not occur.
 
-    // `pfx` is a function that takes a standard CSS property name as a parameter
-    // and returns it's prefixed version valid for current browser it runs in.
-    // The code is heavily inspired by Modernizr http://www.modernizr.com/
-    var pfx = ( function() {
+    $(document).bind('deck.change', function(event, from, to) {
+       alert('Moving from slide ' + from + ' to ' + to);
+    });
+    */
+    change: 'deck.change',
 
-        var style = document.createElement( "dummy" ).style,
-            prefixes = "Webkit Moz O ms Khtml".split( " " ),
-            memory = {};
+    /*
+    This event fires at the beginning of deck initialization. This event makes
+    a good hook for preprocessing extensions looking to modify the DOM before
+    the deck is fully initialized. It is also possible to halt the deck.init
+    event from firing while you do things in beforeInit. This can be done by
+    calling lockInit on the event object passed to this event. The init can be
+    released by calling releaseInit.
 
-        return function( prop ) {
-            if ( typeof memory[ prop ] === "undefined" ) {
+    $(document).bind('deck.beforeInit', function(event) {
+      event.lockInit(); // halts deck.init event
+      window.setTimeout(function() {
+        event.releaseInit(); // deck.init will now fire 2 seconds later
+      }, 2000);
+    });
 
-                var ucProp  = prop.charAt( 0 ).toUpperCase() + prop.substr( 1 ),
-                    props   = ( prop + " " + prefixes.join( ucProp + " " ) + ucProp ).split( " " );
+    The init event will be fired regardless of locks after
+    options.initLockTimeout milliseconds.
+    */
+    beforeInitialize: 'deck.beforeInit',
 
-                memory[ prop ] = null;
-                for ( var i in props ) {
-                    if ( style[ props[ i ] ] !== undefined ) {
-                        memory[ prop ] = props[ i ];
-                        break;
-                    }
-                }
+    /*
+    This event fires at the end of deck initialization. Extensions should
+    implement any code that relies on user extensible options (key bindings,
+    element selectors, classes) within a handler for this event. Native
+    events associated with Deck JS should be scoped under a .deck event
+    namespace, as with the example below:
 
-            }
+    var $d = $(document);
+    $.deck.defaults.keys.myExtensionKeycode = 70; // 'h'
+    $d.bind('deck.init', function() {
+       $d.bind('keydown.deck', function(event) {
+          if (event.which === $.deck.getOptions().keys.myExtensionKeycode) {
+             // Rock out
+          }
+       });
+    });
+    */
+    initialize: 'deck.init'
+  };
 
-            return memory[ prop ];
-        };
+  var options = {};
+  var $document = $(document);
+  var $window = $(window);
+  var stopPropagation = function(event) {
+    event.stopPropagation();
+  };
 
-    } )();
+  var updateContainerState = function() {
+    var oldIndex = $container.data('onSlide');
+    $container.removeClass(options.classes.onPrefix + oldIndex);
+    $container.addClass(options.classes.onPrefix + currentIndex);
+    $container.data('onSlide', currentIndex);
+  };
 
-    // `arraify` takes an array-like object and turns it into real Array
-    // to make all the Array.prototype goodness available.
-    var arrayify = function( a ) {
-        return [].slice.call( a );
-    };
+  var updateChildCurrent = function() {
+    var $oldCurrent = $('.' + options.classes.current);
+    var $oldParents = $oldCurrent.parentsUntil(options.selectors.container);
+    var $newCurrent = slides[currentIndex];
+    var $newParents = $newCurrent.parentsUntil(options.selectors.container);
+    $oldParents.removeClass(options.classes.childCurrent);
+    $newParents.addClass(options.classes.childCurrent);
+  };
 
-    // `css` function applies the styles given in `props` object to the element
-    // given as `el`. It runs all property names through `pfx` function to make
-    // sure proper prefixed version of the property is used.
-    var css = function( el, props ) {
-        var key, pkey;
-        for ( key in props ) {
-            if ( props.hasOwnProperty( key ) ) {
-                pkey = pfx( key );
-                if ( pkey !== null ) {
-                    el.style[ pkey ] = props[ key ];
-                }
-            }
+  var removeOldSlideStates = function() {
+    var $all = $();
+    $.each(slides, function(i, el) {
+      $all = $all.add(el);
+    });
+    $all.removeClass([
+      options.classes.before,
+      options.classes.previous,
+      options.classes.current,
+      options.classes.next,
+      options.classes.after
+    ].join(' '));
+  };
+
+  var addNewSlideStates = function() {
+    slides[currentIndex].addClass(options.classes.current);
+    if (currentIndex > 0) {
+      slides[currentIndex-1].addClass(options.classes.previous);
+    }
+    if (currentIndex + 1 < slides.length) {
+      slides[currentIndex+1].addClass(options.classes.next);
+    }
+    if (currentIndex > 1) {
+      $.each(slides.slice(0, currentIndex - 1), function(i, $slide) {
+        $slide.addClass(options.classes.before);
+      });
+    }
+    if (currentIndex + 2 < slides.length) {
+      $.each(slides.slice(currentIndex+2), function(i, $slide) {
+        $slide.addClass(options.classes.after);
+      });
+    }
+  };
+
+  var setAriaHiddens = function() {
+    $(options.selectors.slides).each(function() {
+      var $slide = $(this);
+      var isSub = $slide.closest('.' + options.classes.childCurrent).length;
+      var isBefore = $slide.hasClass(options.classes.before) && !isSub;
+      var isPrevious = $slide.hasClass(options.classes.previous) && !isSub;
+      var isNext = $slide.hasClass(options.classes.next);
+      var isAfter = $slide.hasClass(options.classes.after);
+      var ariaHiddenValue = isBefore || isPrevious || isNext || isAfter;
+      $slide.attr('aria-hidden', ariaHiddenValue);
+    });
+  };
+
+  var updateStates = function() {
+    updateContainerState();
+    updateChildCurrent();
+    removeOldSlideStates();
+    addNewSlideStates();
+    if (options.setAriaHiddens) {
+      setAriaHiddens();
+    }
+  };
+
+  var initSlidesArray = function(elements) {
+    if ($.isArray(elements)) {
+      $.each(elements, function(i, element) {
+        slides.push($(element));
+      });
+    }
+    else {
+      $(elements).each(function(i, element) {
+        slides.push($(element));
+      });
+    }
+  };
+
+  var bindKeyEvents = function() {
+    var editables = [
+      'input',
+      'textarea',
+      'select',
+      'button',
+      'meter',
+      'progress',
+      '[contentEditable]'
+    ].join(', ');
+
+    $document.unbind('keydown.deck').bind('keydown.deck', function(event) {
+      var isNext = event.which === options.keys.next;
+      var isPrev = event.which === options.keys.previous;
+      isNext = isNext || $.inArray(event.which, options.keys.next) > -1;
+      isPrev = isPrev || $.inArray(event.which, options.keys.previous) > -1;
+
+      if (isNext) {
+        methods.next();
+        event.preventDefault();
+      }
+      else if (isPrev) {
+        methods.prev();
+        event.preventDefault();
+      }
+    });
+
+    $document.undelegate(editables, 'keydown.deck', stopPropagation);
+    $document.delegate(editables, 'keydown.deck', stopPropagation);
+  };
+
+  var bindTouchEvents = function() {
+    var startTouch;
+    var direction = options.touch.swipeDirection;
+    var tolerance = options.touch.swipeTolerance;
+    var listenToHorizontal = ({ both: true, horizontal: true })[direction];
+    var listenToVertical = ({ both: true, vertical: true })[direction];
+
+    $container.unbind('touchstart.deck');
+    $container.bind('touchstart.deck', function(event) {
+      if (!startTouch) {
+        startTouch = $.extend({}, event.originalEvent.targetTouches[0]);
+      }
+    });
+
+    $container.unbind('touchmove.deck');
+    $container.bind('touchmove.deck', function(event) {
+      $.each(event.originalEvent.changedTouches, function(i, touch) {
+        if (!startTouch || touch.identifier !== startTouch.identifier) {
+          return true;
         }
-        return el;
+        var xDistance = touch.screenX - startTouch.screenX;
+        var yDistance = touch.screenY - startTouch.screenY;
+        var leftToRight = xDistance > tolerance && listenToHorizontal;
+        var rightToLeft = xDistance < -tolerance && listenToHorizontal;
+        var topToBottom = yDistance > tolerance && listenToVertical;
+        var bottomToTop = yDistance < -tolerance && listenToVertical;
+
+        if (leftToRight || topToBottom) {
+          $.deck('prev');
+          startTouch = undefined;
+        }
+        else if (rightToLeft || bottomToTop) {
+          $.deck('next');
+          startTouch = undefined;
+        }
+        return false;
+      });
+
+      if (listenToVertical) {
+        event.preventDefault();
+      }
+    });
+
+    $container.unbind('touchend.deck');
+    $container.bind('touchend.deck', function(event) {
+      $.each(event.originalEvent.changedTouches, function(i, touch) {
+        if (startTouch && touch.identifier === startTouch.identifier) {
+          startTouch = undefined;
+        }
+      });
+    });
+  };
+
+  var indexInBounds = function(index) {
+    return typeof index === 'number' && index >=0 && index < slides.length;
+  };
+
+  var createBeforeInitEvent = function() {
+    var event = $.Event(events.beforeInitialize);
+    event.locks = 0;
+    event.done = $.noop;
+    event.lockInit = function() {
+      ++event.locks;
     };
-
-    // `toNumber` takes a value given as `numeric` parameter and tries to turn
-    // it into a number. If it is not possible it returns 0 (or other value
-    // given as `fallback`).
-    var toNumber = function( numeric, fallback ) {
-        return isNaN( numeric ) ? ( fallback || 0 ) : Number( numeric );
+    event.releaseInit = function() {
+      --event.locks;
+      if (!event.locks) {
+        event.done();
+      }
     };
+    return event;
+  };
 
-    // `byId` returns element with given `id` - you probably have guessed that ;)
-    var byId = function( id ) {
-        return document.getElementById( id );
+  var goByHash = function(str) {
+    var id = str.substr(str.indexOf("#") + 1);
+
+    $.each(slides, function(i, $slide) {
+      if ($slide.attr('id') === id) {
+        $.deck('go', i);
+        return false;
+      }
+    });
+
+    // If we don't set these to 0 the container scrolls due to hashchange
+    if (options.preventFragmentScroll) {
+      $.deck('getContainer').scrollLeft(0).scrollTop(0);
+    }
+  };
+
+  var assignSlideId = function(i, $slide) {
+    var currentId = $slide.attr('id');
+    var previouslyAssigned = $slide.data('deckAssignedId') === currentId;
+    if (!currentId || previouslyAssigned) {
+      $slide.attr('id', options.hashPrefix + i);
+      $slide.data('deckAssignedId', options.hashPrefix + i);
+    }
+  };
+
+  var removeContainerHashClass = function(id) {
+    $container.removeClass(options.classes.onPrefix + id);
+  };
+
+  var addContainerHashClass = function(id) {
+    $container.addClass(options.classes.onPrefix + id);
+  };
+
+  var setupHashBehaviors = function() {
+    $fragmentLinks = $();
+    $.each(slides, function(i, $slide) {
+      var hash;
+
+      assignSlideId(i, $slide);
+      hash = '#' + $slide.attr('id');
+      if (hash === window.location.hash) {
+        setTimeout(function() {
+          $.deck('go', i);
+        }, 1);
+      }
+      $fragmentLinks = $fragmentLinks.add('a[href="' + hash + '"]');
+    });
+
+    if (slides.length) {
+      addContainerHashClass($.deck('getSlide').attr('id'));
     };
+  };
 
-    // `$` returns first element for given CSS `selector` in the `context` of
-    // the given element or whole document.
-    var $ = function( selector, context ) {
-        context = context || document;
-        return context.querySelector( selector );
-    };
+  var changeHash = function(from, to) {
+    var hash = '#' + $.deck('getSlide', to).attr('id');
+    var hashPath = window.location.href.replace(/#.*/, '') + hash;
 
-    // `$$` return an array of elements for given CSS `selector` in the `context` of
-    // the given element or whole document.
-    var $$ = function( selector, context ) {
-        context = context || document;
-        return arrayify( context.querySelectorAll( selector ) );
-    };
+    removeContainerHashClass($.deck('getSlide', from).attr('id'));
+    addContainerHashClass($.deck('getSlide', to).attr('id'));
+    if (Modernizr.history) {
+      window.history.replaceState({}, "", hashPath);
+    }
+  };
 
-    // `triggerEvent` builds a custom DOM event with given `eventName` and `detail` data
-    // and triggers it on element given as `el`.
-    var triggerEvent = function( el, eventName, detail ) {
-        var event = document.createEvent( "CustomEvent" );
-        event.initCustomEvent( eventName, true, true, detail );
-        el.dispatchEvent( event );
-    };
+  /* Methods exposed in the jQuery.deck namespace */
+  var methods = {
 
-    // `translate` builds a translate transform string for given data.
-    var translate = function( t ) {
-        return " translate3d(" + t.x + "px," + t.y + "px," + t.z + "px) ";
-    };
+    /*
+    jQuery.deck(selector, options)
 
-    // `rotate` builds a rotate transform string for given data.
-    // By default the rotations are in X Y Z order that can be reverted by passing `true`
-    // as second parameter.
-    var rotate = function( r, revert ) {
-        var rX = " rotateX(" + r.x + "deg) ",
-            rY = " rotateY(" + r.y + "deg) ",
-            rZ = " rotateZ(" + r.z + "deg) ";
+    selector: string | jQuery | array
+    options: object, optional
 
-        return revert ? rZ + rY + rX : rX + rY + rZ;
-    };
+    Initializes the deck, using each element matched by selector as a slide.
+    May also be passed an array of string selectors or jQuery objects, in
+    which case each selector in the array is considered a slide. The second
+    parameter is an optional options object which will extend the default
+    values.
 
-    // `scale` builds a scale transform string for given data.
-    var scale = function( s ) {
-        return " scale(" + s + ") ";
-    };
+    Users may also pass only an options object to init. In this case the slide
+    selector will be options.selectors.slides which defaults to .slide.
 
-    // `perspective` builds a perspective transform string for given data.
-    var perspective = function( p ) {
-        return " perspective(" + p + "px) ";
-    };
+    $.deck('.slide');
 
-    // `getElementFromHash` returns an element located by id from hash part of
-    // window location.
-    var getElementFromHash = function() {
+    or
 
-        // Get id from url # by removing `#` or `#/` from the beginning,
-        // so both "fallback" `#slide-id` and "enhanced" `#/slide-id` will work
-        return byId( window.location.hash.replace( /^#\/?/, "" ) );
-    };
+    $.deck([
+       '#first-slide',
+       '#second-slide',
+       '#etc'
+    ]);
+    */
+    init: function(opts) {
+      var beforeInitEvent = createBeforeInitEvent();
+      var overrides = opts;
 
-    // `computeWindowScale` counts the scale factor between window size and size
-    // defined for the presentation in the config.
-    var computeWindowScale = function( config ) {
-        var hScale = window.innerHeight / config.height,
-            wScale = window.innerWidth / config.width,
-            scale = hScale > wScale ? wScale : hScale;
+      if (!$.isPlainObject(opts)) {
+        overrides = arguments[1] || {};
+        $.extend(true, overrides, {
+          selectors: {
+            slides: arguments[0]
+          }
+        });
+      }
 
-        if ( config.maxScale && scale > config.maxScale ) {
-            scale = config.maxScale;
+      options = $.extend(true, {}, $.deck.defaults, overrides);
+      slides = [];
+      currentIndex = 0;
+      $container = $(options.selectors.container);
+
+      // Hide the deck while states are being applied to kill transitions
+      $container.addClass(options.classes.loading);
+
+      // populate the array of slides for pre-init
+      initSlidesArray(options.selectors.slides);
+      // Pre init event for preprocessing hooks
+      beforeInitEvent.done = function() {
+        // re-populate the array of slides
+        slides = [];
+        initSlidesArray(options.selectors.slides);
+        setupHashBehaviors();
+        bindKeyEvents();
+        bindTouchEvents();
+        $container.scrollLeft(0).scrollTop(0);
+
+        if (slides.length) {
+          updateStates();
         }
 
-        if ( config.minScale && scale < config.minScale ) {
-            scale = config.minScale;
+        // Show deck again now that slides are in place
+        $container.removeClass(options.classes.loading);
+        $document.trigger(events.initialize);
+      };
+
+      $document.trigger(beforeInitEvent);
+      if (!beforeInitEvent.locks) {
+        beforeInitEvent.done();
+      }
+      window.setTimeout(function() {
+        if (beforeInitEvent.locks) {
+          if (window.console) {
+            window.console.warn('Something locked deck initialization\
+              without releasing it before the timeout. Proceeding with\
+              initialization anyway.');
+          }
+          beforeInitEvent.done();
         }
+      }, options.initLockTimeout);
+    },
 
-        return scale;
-    };
+    /*
+    jQuery.deck('go', index)
 
-    // CHECK SUPPORT
-    var body = document.body;
+    index: integer | string
 
-    var ua = navigator.userAgent.toLowerCase();
-    var impressSupported =
+    Moves to the slide at the specified index if index is a number. Index is
+    0-based, so $.deck('go', 0); will move to the first slide. If index is a
+    string this will move to the slide with the specified id. If index is out
+    of bounds or doesn't match a slide id the call is ignored.
+    */
+    go: function(indexOrId) {
+      var beforeChangeEvent = $.Event(events.beforeChange);
+      var index;
 
-                          // Browser should support CSS 3D transtorms
-                           ( pfx( "perspective" ) !== null ) &&
+      /* Number index, easy. */
+      if (indexInBounds(indexOrId)) {
+        index = indexOrId;
+      }
+      /* Id string index, search for it and set integer index */
+      else if (typeof indexOrId === 'string') {
+        $.each(slides, function(i, $slide) {
+          if ($slide.attr('id') === indexOrId) {
+            index = i;
+            return false;
+          }
+        });
+      }
+      if (typeof index === 'undefined') {
+        return;
+      }
 
-                          // Browser should support `classList` and `dataset` APIs
-                           ( body.classList ) &&
-                           ( body.dataset ) &&
+      /* Trigger beforeChange. If nothing prevents the change, trigger
+      the slide change. */
+      $document.trigger(beforeChangeEvent, [currentIndex, index]);
+      if (!beforeChangeEvent.isDefaultPrevented()) {
+        $document.trigger(events.change, [currentIndex, index]);
+        changeHash(currentIndex, index);
+        currentIndex = index;
+        updateStates();
+      }
+    },
 
-                          // But some mobile devices need to be blacklisted,
-                          // because their CSS 3D support or hardware is not
-                          // good enough to run impress.js properly, sorry...
-                           ( ua.search( /(iphone)|(ipod)|(android)/ ) === -1 );
+    /*
+    jQuery.deck('next')
 
-    if ( !impressSupported ) {
+    Moves to the next slide. If the last slide is already active, the call
+    is ignored.
+    */
+    next: function() {
+      methods.go(currentIndex+1);
+    },
 
-        // We can't be sure that `classList` is supported
-        body.className += " impress-not-supported ";
-    } else {
-        body.classList.remove( "impress-not-supported" );
-        body.classList.add( "impress-supported" );
+    /*
+    jQuery.deck('prev')
+
+    Moves to the previous slide. If the first slide is already active, the
+    call is ignored.
+    */
+    prev: function() {
+      methods.go(currentIndex-1);
+    },
+
+    /*
+    jQuery.deck('getSlide', index)
+
+    index: integer, optional
+
+    Returns a jQuery object containing the slide at index. If index is not
+    specified, the current slide is returned.
+    */
+    getSlide: function(index) {
+      index = typeof index !== 'undefined' ? index : currentIndex;
+      if (!indexInBounds(index)) {
+        return null;
+      }
+      return slides[index];
+    },
+
+    /*
+    jQuery.deck('getSlides')
+
+    Returns all slides as an array of jQuery objects.
+    */
+    getSlides: function() {
+      return slides;
+    },
+
+    /*
+    jQuery.deck('getTopLevelSlides')
+
+    Returns all slides that are not subslides.
+    */
+    getTopLevelSlides: function() {
+      var topLevelSlides = [];
+      var slideSelector = options.selectors.slides;
+      var subSelector = [slideSelector, slideSelector].join(' ');
+      $.each(slides, function(i, $slide) {
+        if (!$slide.is(subSelector)) {
+          topLevelSlides.push($slide);
+        }
+      });
+      return topLevelSlides;
+    },
+
+    /*
+    jQuery.deck('getNestedSlides', index)
+
+    index: integer, optional
+
+    Returns all the nested slides of the current slide. If index is
+    specified it returns the nested slides of the slide at that index.
+    If there are no nested slides this will return an empty array.
+    */
+    getNestedSlides: function(index) {
+      var targetIndex = index == null ? currentIndex : index;
+      var $targetSlide = $.deck('getSlide', targetIndex);
+      var $nesteds = $targetSlide.find(options.selectors.slides);
+      var nesteds = $nesteds.get();
+      return $.map(nesteds, function(slide, i) {
+        return $(slide);
+      });
+    },
+
+
+    /*
+    jQuery.deck('getContainer')
+
+    Returns a jQuery object containing the deck container as defined by the
+    container option.
+    */
+    getContainer: function() {
+      return $container;
+    },
+
+    /*
+    jQuery.deck('getOptions')
+
+    Returns the options object for the deck, including any overrides that
+    were defined at initialization.
+    */
+    getOptions: function() {
+      return options;
+    },
+
+    /*
+    jQuery.deck('extend', name, method)
+
+    name: string
+    method: function
+
+    Adds method to the deck namespace with the key of name. This doesn’t
+    give access to any private member data — public methods must still be
+    used within method — but lets extension authors piggyback on the deck
+    namespace rather than pollute jQuery.
+
+    $.deck('extend', 'alert', function(msg) {
+       alert(msg);
+    });
+
+    // Alerts 'boom'
+    $.deck('alert', 'boom');
+    */
+    extend: function(name, method) {
+      methods[name] = method;
+    }
+  };
+
+  /* jQuery extension */
+  $.deck = function(method, arg) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    if (methods[method]) {
+      return methods[method].apply(this, args);
+    }
+    else {
+      return methods.init(method, arg);
+    }
+  };
+
+  /*
+  The default settings object for a deck. All deck extensions should extend
+  this object to add defaults for any of their options.
+
+  options.classes.after
+    This class is added to all slides that appear after the 'next' slide.
+
+  options.classes.before
+    This class is added to all slides that appear before the 'previous'
+    slide.
+
+  options.classes.childCurrent
+    This class is added to all elements in the DOM tree between the
+    'current' slide and the deck container. For standard slides, this is
+    mostly seen and used for nested slides.
+
+  options.classes.current
+    This class is added to the current slide.
+
+  options.classes.loading
+    This class is applied to the deck container during loading phases and is
+    primarily used as a way to short circuit transitions between states
+    where such transitions are distracting or unwanted.  For example, this
+    class is applied during deck initialization and then removed to prevent
+    all the slides from appearing stacked and transitioning into place
+    on load.
+
+  options.classes.next
+    This class is added to the slide immediately following the 'current'
+    slide.
+
+  options.classes.onPrefix
+    This prefix, concatenated with the current slide index, is added to the
+    deck container as you change slides.
+
+  options.classes.previous
+    This class is added to the slide immediately preceding the 'current'
+    slide.
+
+  options.selectors.container
+    Elements matched by this CSS selector will be considered the deck
+    container. The deck container is used to scope certain states of the
+    deck, as with the onPrefix option, or with extensions such as deck.goto
+    and deck.menu.
+
+  options.selectors.slides
+    Elements matched by this selector make up the individual deck slides.
+    If a user chooses to pass the slide selector as the first argument to
+    $.deck() on initialization it does the same thing as passing in this
+    option and this option value will be set to the value of that parameter.
+
+  options.keys.next
+    The numeric keycode used to go to the next slide.
+
+  options.keys.previous
+    The numeric keycode used to go to the previous slide.
+
+  options.touch.swipeDirection
+    The direction swipes occur to cause slide changes. Can be 'horizontal',
+    'vertical', or 'both'. Any other value or a falsy value will disable
+    swipe gestures for navigation.
+
+  options.touch.swipeTolerance
+    The number of pixels the users finger must travel to produce a swipe
+    gesture.
+
+  options.initLockTimeout
+    The number of milliseconds the init event will wait for BeforeInit event
+    locks to be released before firing the init event regardless.
+
+  options.hashPrefix
+    Every slide that does not have an id is assigned one at initialization.
+    Assigned ids take the form of hashPrefix + slideIndex, e.g., slide-0,
+    slide-12, etc.
+
+  options.preventFragmentScroll
+    When deep linking to a hash of a nested slide, this scrolls the deck
+    container to the top, undoing the natural browser behavior of scrolling
+    to the document fragment on load.
+
+  options.setAriaHiddens
+    When set to true, deck.js will set aria hidden attributes for slides
+    that do not appear onscreen according to a typical heirarchical
+    deck structure. You may want to turn this off if you are using a theme
+    where slides besides the current slide are visible on screen and should
+    be accessible to screenreaders.
+  */
+  $.deck.defaults = {
+    classes: {
+      after: 'deck-after',
+      before: 'deck-before',
+      childCurrent: 'deck-child-current',
+      current: 'deck-current',
+      loading: 'deck-loading',
+      next: 'deck-next',
+      onPrefix: 'on-slide-',
+      previous: 'deck-previous'
+    },
+
+    selectors: {
+      container: '.deck-container',
+      slides: '.slide'
+    },
+
+    keys: {
+      // enter, space, page down, right arrow, down arrow,
+      next: [13, 32, 34, 39, 40],
+      // backspace, page up, left arrow, up arrow
+      previous: [8, 33, 37, 38]
+    },
+
+    touch: {
+      swipeDirection: 'horizontal',
+      swipeTolerance: 60
+    },
+
+    initLockTimeout: 10000,
+    hashPrefix: 'slide-',
+    preventFragmentScroll: true,
+    setAriaHiddens: true
+  };
+
+  $document.ready(function() {
+    $('html').addClass('ready');
+  });
+
+  $window.bind('hashchange.deck', function(event) {
+    if (event.originalEvent && event.originalEvent.newURL) {
+      goByHash(event.originalEvent.newURL);
+    }
+    else {
+      goByHash(window.location.hash);
+    }
+  });
+
+  $window.bind('load.deck', function() {
+    if (options.preventFragmentScroll) {
+      $container.scrollLeft(0).scrollTop(0);
+    }
+  });
+})(jQuery);
+
+/*!
+Deck JS - deck.menu
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
+
+/*
+This module adds the methods and key binding to show and hide a menu of all
+slides in the deck. The deck menu state is indicated by the presence of a class
+on the deck container.
+*/
+(function($, undefined) {
+  var $document = $(document);
+  var $html = $('html');
+  var rootSlides;
+
+  var populateRootSlidesArray = function() {
+    var options = $.deck('getOptions');
+    var slideTest = $.map([
+      options.classes.before,
+      options.classes.previous,
+      options.classes.current,
+      options.classes.next,
+      options.classes.after
+    ], function(el, i) {
+      return '.' + el;
+    }).join(', ');
+
+    rootSlides = [];
+    $.each($.deck('getSlides'), function(i, $slide) {
+      var $parentSlides = $slide.parentsUntil(
+        options.selectors.container,
+        slideTest
+      );
+      if (!$parentSlides.length) {
+        rootSlides.push($slide);
+      }
+    });
+  };
+
+  var bindKeyEvents = function() {
+    var options = $.deck('getOptions');
+    $document.unbind('keydown.deckmenu');
+    $document.bind('keydown.deckmenu', function(event) {
+      var isMenuKey = event.which === options.keys.menu;
+      isMenuKey = isMenuKey || $.inArray(event.which, options.keys.menu) > -1;
+      if (isMenuKey && !event.ctrlKey) {
+        $.deck('toggleMenu');
+        event.preventDefault();
+      }
+    });
+  };
+
+  var bindTouchEvents = function() {
+    var $container = $.deck('getContainer');
+    var options = $.deck('getOptions');
+    var touchEndTime = 0;
+    var currentSlide;
+
+    $container.unbind('touchstart.deckmenu');
+    $container.bind('touchstart.deckmenu', function() {
+      currentSlide = $.deck('getSlide');
+    });
+    $container.unbind('touchend.deckmenu');
+    $container.bind('touchend.deckmenu', function(event) {
+      var now = Date.now();
+      var isDoubletap = now - touchEndTime < options.touch.doubletapWindow;
+
+      // Ignore this touch event if it caused a nav change (swipe)
+      if (currentSlide !== $.deck('getSlide')) {
+        return;
+      }
+      if (isDoubletap) {
+        $.deck('toggleMenu');
+        event.preventDefault();
+      }
+      touchEndTime = now;
+    });
+  };
+
+  var setupMenuSlideSelection = function() {
+    var options = $.deck('getOptions');
+
+    $.each($.deck('getSlides'), function(i, $slide) {
+      $slide.unbind('click.deckmenu');
+      $slide.bind('click.deckmenu', function(event) {
+        if (!$.deck('getContainer').hasClass(options.classes.menu)) {
+          return;
+        }
+        $.deck('go', i);
+        $.deck('hideMenu');
+        event.stopPropagation();
+        event.preventDefault();
+      });
+    });
+  };
+
+  /*
+  Extends defaults/options.
+
+  options.classes.menu
+    This class is added to the deck container when showing the slide menu.
+
+  options.keys.menu
+    The numeric keycode used to toggle between showing and hiding the slide
+    menu.
+
+  options.touch.doubletapWindow
+    Two consecutive touch events within this number of milliseconds will
+    be considered a double tap, and will toggle the menu on touch devices.
+  */
+  $.extend(true, $.deck.defaults, {
+    classes: {
+      menu: 'deck-menu'
+    },
+
+    keys: {
+      menu: 77 // m
+    },
+
+    touch: {
+      doubletapWindow: 400
+    }
+  });
+
+  /*
+  jQuery.deck('showMenu')
+
+  Shows the slide menu by adding the class specified by the menu class option
+  to the deck container.
+  */
+  $.deck('extend', 'showMenu', function() {
+    var $container = $.deck('getContainer');
+    var options = $.deck('getOptions');
+
+    if ($container.hasClass(options.classes.menu)) {
+      return;
     }
 
-    // GLOBALS AND DEFAULTS
+    // Hide through loading class to short-circuit transitions (perf)
+    $container.addClass([
+      options.classes.loading,
+      options.classes.menu
+    ].join(' '));
 
-    // This is where the root elements of all impress.js instances will be kept.
-    // Yes, this means you can have more than one instance on a page, but I'm not
-    // sure if it makes any sense in practice ;)
-    var roots = {};
+    /* Forced to do this in JS until CSS learns second-grade math. Save old
+    style value for restoration when menu is hidden. */
+    if (Modernizr.csstransforms) {
+      $.each(rootSlides, function(i, $slide) {
+        $slide.data('oldStyle', $slide.attr('style'));
+        $slide.css({
+          'position': 'absolute',
+          'left': ((i % 4) * 25) + '%',
+          'top': (Math.floor(i / 4) * 25) + '%'
+        });
+      });
+    }
 
-    // Some default config values.
-    var defaults = {
-        width: 1024,
-        height: 768,
-        maxScale: 1,
-        minScale: 0,
+    // Need to ensure the loading class renders first, then remove
+    window.setTimeout(function() {
+      $container.removeClass(options.classes.loading);
+      $container.scrollTop($.deck('getSlide').position().top);
+    }, 0);
+  });
 
-        perspective: 1000,
+  /*
+  jQuery.deck('hideMenu')
 
-        transitionDuration: 1000
-    };
+  Hides the slide menu by removing the class specified by the menu class
+  option from the deck container.
+  */
+  $.deck('extend', 'hideMenu', function() {
+    var $container = $.deck('getContainer');
+    var options = $.deck('getOptions');
 
-    // It's just an empty function ... and a useless comment.
-    var empty = function() { return false; };
+    if (!$container.hasClass(options.classes.menu)) {
+      return;
+    }
 
-    // IMPRESS.JS API
+    $container.removeClass(options.classes.menu);
+    $container.addClass(options.classes.loading);
 
-    // And that's where interesting things will start to happen.
-    // It's the core `impress` function that returns the impress.js API
-    // for a presentation based on the element with given id ('impress'
-    // by default).
-    var impress = window.impress = function( rootId ) {
+    /* Restore old style value */
+    if (Modernizr.csstransforms) {
+      $.each(rootSlides, function(i, $slide) {
+        var oldStyle = $slide.data('oldStyle');
+        $slide.attr('style', oldStyle ? oldStyle : '');
+      });
+    }
 
-        // If impress.js is not supported by the browser return a dummy API
-        // it may not be a perfect solution but we return early and avoid
-        // running code that may use features not implemented in the browser.
-        if ( !impressSupported ) {
-            return {
-                init: empty,
-                goto: empty,
-                prev: empty,
-                next: empty
-            };
+    window.setTimeout(function() {
+      $container.removeClass(options.classes.loading);
+      $container.scrollTop(0);
+    }, 0);
+  });
+
+  /*
+  jQuery.deck('toggleMenu')
+
+  Toggles between showing and hiding the slide menu.
+  */
+  $.deck('extend', 'toggleMenu', function() {
+    $.deck('getContainer').hasClass($.deck('getOptions').classes.menu) ?
+    $.deck('hideMenu') : $.deck('showMenu');
+  });
+
+  $document.bind('deck.init', function() {
+    populateRootSlidesArray();
+    bindKeyEvents();
+    bindTouchEvents();
+    setupMenuSlideSelection();
+  });
+
+  $document.bind('deck.change', function(event, from, to) {
+    var $container = $.deck('getContainer');
+    var containerScroll, slideTop;
+
+    if ($container.hasClass($.deck('getOptions').classes.menu)) {
+      containerScroll = $container.scrollTop();
+      slideTop = $.deck('getSlide', to).position().top;
+      $container.scrollTop(containerScroll + slideTop);
+    }
+  });
+})(jQuery);
+
+/*!
+Deck JS - deck.goto
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
+
+/*
+This module adds the necessary methods and key bindings to show and hide a form
+for jumping to any slide number/id in the deck (and processes that form
+accordingly). The form-showing state is indicated by the presence of a class on
+the deck container.
+*/
+(function($, undefined) {
+  var $document = $(document);
+  var rootCounter;
+
+  var bindKeyEvents = function() {
+    $document.unbind('keydown.deckgoto');
+    $document.bind('keydown.deckgoto', function(event) {
+      var key = $.deck('getOptions').keys.goto;
+      if (event.which === key || $.inArray(event.which, key) > -1) {
+        event.preventDefault();
+        $.deck('toggleGoTo');
+      }
+    });
+  };
+
+  var populateDatalist = function() {
+    var options = $.deck('getOptions');
+    var $datalist = $(options.selectors.gotoDatalist);
+
+    $.each($.deck('getSlides'), function(i, $slide) {
+      var id = $slide.attr('id');
+      if (id) {
+        $datalist.append('<option value="' + id + '">');
+      }
+    });
+  };
+
+  var markRootSlides = function() {
+    var options = $.deck('getOptions');
+    var slideTest = $.map([
+      options.classes.before,
+      options.classes.previous,
+      options.classes.current,
+      options.classes.next,
+      options.classes.after
+    ], function(el, i) {
+      return '.' + el;
+    }).join(', ');
+
+    rootCounter = 0;
+    $.each($.deck('getSlides'), function(i, $slide) {
+      var $parentSlides = $slide.parentsUntil(
+        options.selectors.container,
+        slideTest
+      );
+
+      if ($parentSlides.length) {
+        $slide.removeData('rootIndex');
+      }
+      else if (!options.countNested) {
+        ++rootCounter;
+        $slide.data('rootIndex', rootCounter);
+      }
+    });
+  };
+
+  var handleFormSubmit = function() {
+    var options = $.deck('getOptions');
+    var $form = $(options.selectors.gotoForm);
+
+    $form.unbind('submit.deckgoto');
+    $form.bind('submit.deckgoto', function(event) {
+      var $field = $(options.selectors.gotoInput);
+      var indexOrId = $field.val();
+      var index = parseInt(indexOrId, 10);
+
+      if (!options.countNested) {
+        if (!isNaN(index) && index >= rootCounter) {
+          return false;
         }
+        $.each($.deck('getSlides'), function(i, $slide) {
+          if ($slide.data('rootIndex') === index) {
+            index = i + 1;
+            return false;
+          }
+        });
+      }
+
+      $.deck('go', isNaN(index) ? indexOrId : index - 1);
+      $.deck('hideGoTo');
+      $field.val('');
+      event.preventDefault();
+    });
+  };
+
+  /*
+  Extends defaults/options.
+
+  options.classes.goto
+    This class is added to the deck container when showing the Go To Slide
+    form.
+
+  options.selectors.gotoDatalist
+    The element that matches this selector is the datalist element that will
+    be populated with options for each of the slide ids.  In browsers that
+    support the datalist element, this provides a drop list of slide ids to
+    aid the user in selecting a slide.
+
+  options.selectors.gotoForm
+    The element that matches this selector is the form that is submitted
+    when a user hits enter after typing a slide number/id in the gotoInput
+    element.
+
+  options.selectors.gotoInput
+    The element that matches this selector is the text input field for
+    entering a slide number/id in the Go To Slide form.
+
+  options.keys.goto
+    The numeric keycode used to show the Go To Slide form.
+
+  options.countNested
+    If false, only top level slides will be counted when entering a
+    slide number.
+  */
+  $.extend(true, $.deck.defaults, {
+    classes: {
+      goto: 'deck-goto'
+    },
+
+    selectors: {
+      gotoDatalist: '#goto-datalist',
+      gotoForm: '.goto-form',
+      gotoInput: '#goto-slide'
+    },
+
+    keys: {
+      goto: 71 // g
+    },
+
+    countNested: true
+  });
+
+  /*
+  jQuery.deck('showGoTo')
+
+  Shows the Go To Slide form by adding the class specified by the goto class
+  option to the deck container.
+  */
+  $.deck('extend', 'showGoTo', function() {
+    var options = $.deck('getOptions');
+    $.deck('getContainer').addClass(options.classes.goto);
+    $(options.selectors.gotoForm).attr('aria-hidden', false);
+    $(options.selectors.gotoInput).focus();
+  });
+
+  /*
+  jQuery.deck('hideGoTo')
+
+  Hides the Go To Slide form by removing the class specified by the goto class
+  option from the deck container.
+  */
+  $.deck('extend', 'hideGoTo', function() {
+    var options = $.deck('getOptions');
+    $(options.selectors.gotoInput).blur();
+    $.deck('getContainer').removeClass(options.classes.goto);
+    $(options.selectors.gotoForm).attr('aria-hidden', true);
+  });
+
+  /*
+  jQuery.deck('toggleGoTo')
+
+  Toggles between showing and hiding the Go To Slide form.
+  */
+  $.deck('extend', 'toggleGoTo', function() {
+    var options = $.deck('getOptions');
+    var hasGotoClass = $.deck('getContainer').hasClass(options.classes.goto);
+    $.deck(hasGotoClass ? 'hideGoTo' : 'showGoTo');
+  });
+
+  $document.bind('deck.init', function() {
+    bindKeyEvents();
+    populateDatalist();
+    markRootSlides();
+    handleFormSubmit();
+  });
+})(jQuery);
+
+
+/*!
+Deck JS - deck.status
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
+
+/*
+This module adds a (current)/(total) style status indicator to the deck.
+*/
+(function($, undefined) {
+  var $document = $(document);
+  var rootCounter;
+
+  var updateCurrent = function(event, from, to) {
+    var options = $.deck('getOptions');
+    var currentSlideNumber = to + 1;
+    if (!options.countNested) {
+      currentSlideNumber = $.deck('getSlide', to).data('rootSlide');
+    }
+    $(options.selectors.statusCurrent).text(currentSlideNumber);
+  };
+
+  var markRootSlides = function() {
+    var options = $.deck('getOptions');
+    var slideTest = $.map([
+      options.classes.before,
+      options.classes.previous,
+      options.classes.current,
+      options.classes.next,
+      options.classes.after
+    ], function(el, i) {
+      return '.' + el;
+    }).join(', ');
+
+    rootCounter = 0;
+    $.each($.deck('getSlides'), function(i, $slide) {
+      var $parentSlides = $slide.parentsUntil(
+        options.selectors.container,
+        slideTest
+      );
+
+      if ($parentSlides.length) {
+        $slide.data('rootSlide', $parentSlides.last().data('rootSlide'));
+      }
+      else {
+        ++rootCounter;
+        $slide.data('rootSlide', rootCounter);
+      }
+    });
+  };
+
+  var setInitialSlideNumber = function() {
+    var slides = $.deck('getSlides');
+    var $currentSlide = $.deck('getSlide');
+    var index;
+
+    $.each(slides, function(i, $slide) {
+      if ($slide === $currentSlide) {
+        index = i;
+        return false;
+      }
+    });
+    updateCurrent(null, index, index);
+  };
+
+  var setTotalSlideNumber = function() {
+    var options = $.deck('getOptions');
+    var slides = $.deck('getSlides');
+
+    if (options.countNested) {
+      $(options.selectors.statusTotal).text(slides.length);
+    }
+    else {
+      $(options.selectors.statusTotal).text(rootCounter);
+    }
+  };
+
+  /*
+  Extends defaults/options.
+
+  options.selectors.statusCurrent
+    The element matching this selector displays the current slide number.
+
+  options.selectors.statusTotal
+    The element matching this selector displays the total number of slides.
+
+  options.countNested
+    If false, only top level slides will be counted in the current and
+    total numbers.
+  */
+  $.extend(true, $.deck.defaults, {
+    selectors: {
+      statusCurrent: '.deck-status-current',
+      statusTotal: '.deck-status-total'
+    },
+
+    countNested: true
+  });
+
+  $document.bind('deck.init', function() {
+    markRootSlides();
+    setInitialSlideNumber();
+    setTotalSlideNumber();
+  });
+  $document.bind('deck.change', updateCurrent);
+})(jQuery, 'deck');
+
+
+/*!
+Deck JS - deck.navigation
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
+
+/*
+This module adds clickable previous and next links to the deck.
+*/
+(function($, undefined) {
+  var $document = $(document);
+
+  /* Updates link hrefs, and disabled states if last/first slide */
+  var updateButtons = function(event, from, to) {
+    var options = $.deck('getOptions');
+    var lastIndex = $.deck('getSlides').length - 1;
+    var $prevSlide = $.deck('getSlide', to - 1);
+    var $nextSlide = $.deck('getSlide', to + 1);
+    var hrefBase = window.location.href.replace(/#.*/, '');
+    var prevId = $prevSlide ? $prevSlide.attr('id') : undefined;
+    var nextId = $nextSlide ? $nextSlide.attr('id') : undefined;
+    var $prevButton = $(options.selectors.previousLink);
+    var $nextButton = $(options.selectors.nextLink);
+
+    $prevButton.toggleClass(options.classes.navDisabled, to === 0);
+    $prevButton.attr('aria-disabled', to === 0);
+    $prevButton.attr('href', hrefBase + '#' + (prevId ? prevId : ''));
+    $nextButton.toggleClass(options.classes.navDisabled, to === lastIndex);
+    $nextButton.attr('aria-disabled', to === lastIndex);
+    $nextButton.attr('href', hrefBase + '#' + (nextId ? nextId : ''));
+  };
+
+  /*
+  Extends defaults/options.
+
+  options.classes.navDisabled
+    This class is added to a navigation link when that action is disabled.
+    It is added to the previous link when on the first slide, and to the
+    next link when on the last slide.
+
+  options.selectors.nextLink
+    The elements that match this selector will move the deck to the next
+    slide when clicked.
+
+  options.selectors.previousLink
+    The elements that match this selector will move to deck to the previous
+    slide when clicked.
+  */
+  $.extend(true, $.deck.defaults, {
+    classes: {
+      navDisabled: 'deck-nav-disabled'
+    },
+
+    selectors: {
+      nextLink: '.deck-next-link',
+      previousLink: '.deck-prev-link'
+    }
+  });
+
+  $document.bind('deck.init', function() {
+    var options = $.deck('getOptions');
+    var slides = $.deck('getSlides');
+    var $current = $.deck('getSlide');
+    var $prevButton = $(options.selectors.previousLink);
+    var $nextButton = $(options.selectors.nextLink);
+    var index;
+
+    // Setup prev/next link events
+    $prevButton.unbind('click.decknavigation');
+    $prevButton.bind('click.decknavigation', function(event) {
+      $.deck('prev');
+      event.preventDefault();
+    });
+
+    $nextButton.unbind('click.decknavigation');
+    $nextButton.bind('click.decknavigation', function(event) {
+      $.deck('next');
+      event.preventDefault();
+    });
+
+    // Find where we started in the deck and set initial states
+    $.each(slides, function(i, $slide) {
+      if ($slide === $current) {
+        index = i;
+        return false;
+      }
+    });
+    updateButtons(null, index, index);
+  });
+
+  $document.bind('deck.change', updateButtons);
+})(jQuery);
+
+
+/*!
+Deck JS - deck.scale
+Copyright (c) 2011-2014 Caleb Troughton
+Dual licensed under the MIT license.
+https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt
+*/
+
+/*
+This module adds automatic scaling to the deck.  Slides are scaled down
+using CSS transforms to fit within the deck container. If the container is
+big enough to hold the slides without scaling, no scaling occurs. The user
+can disable and enable scaling with a keyboard shortcut.
+
+Note: CSS transforms may make Flash videos render incorrectly.  Presenters
+that need to use video may want to disable scaling to play them.  HTML5 video
+works fine.
+*/
+(function($, undefined) {
+  var $document = $(document);
+  var $window = $(window);
+  var baseHeight, timer, rootSlides;
+
+  /*
+  Internal function to do all the dirty work of scaling the slides.
+  */
+  var scaleDeck = function() {
+    var options = $.deck('getOptions');
+    var $container = $.deck('getContainer');
+    var baseHeight = options.baseHeight;
+
+    if (!baseHeight) {
+      baseHeight = $container.height();
+    }
+
+    // Scale each slide down if necessary (but don't scale up)
+    $.each(rootSlides, function(i, $slide) {
+      var slideHeight = $slide.innerHeight();
+      var $scaler = $slide.find('.' + options.classes.scaleSlideWrapper);
+      var shouldScale = $container.hasClass(options.classes.scale);
+      var scale = shouldScale ? baseHeight / slideHeight : 1;
+
+      if (scale === 1) {
+        $scaler.css('transform', '');
+      }
+      else {
+        $scaler.css('transform', 'scale(' + scale + ')');
+        window.setTimeout(function() {
+          $container.scrollTop(0)
+        }, 1);
+      }
+    });
+  };
+
+  var populateRootSlides = function() {
+    var options = $.deck('getOptions');
+    var slideTest = $.map([
+      options.classes.before,
+      options.classes.previous,
+      options.classes.current,
+      options.classes.next,
+      options.classes.after
+    ], function(el, i) {
+      return '.' + el;
+    }).join(', ');
+
+    rootSlides = [];
+    $.each($.deck('getSlides'), function(i, $slide) {
+      var $parentSlides = $slide.parentsUntil(
+        options.selectors.container,
+        slideTest
+      );
+      if (!$parentSlides.length) {
+        rootSlides.push($slide);
+      }
+    });
+  };
+
+  var wrapRootSlideContent = function() {
+    var options = $.deck('getOptions');
+    var wrap = '<div class="' + options.classes.scaleSlideWrapper + '"/>';
+    $.each(rootSlides, function(i, $slide) {
+      $slide.children().wrapAll(wrap);
+    });
+  };
+
+  var scaleOnResizeAndLoad = function() {
+    var options = $.deck('getOptions');
+
+    $window.unbind('resize.deckscale');
+    $window.bind('resize.deckscale', function() {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(scaleDeck, options.scaleDebounce);
+    });
+    $.deck('enableScale');
+    $window.unbind('load.deckscale');
+    $window.bind('load.deckscale', scaleDeck);
+  };
+
+  var bindKeyEvents = function() {
+    var options = $.deck('getOptions');
+    $document.unbind('keydown.deckscale');
+    $document.bind('keydown.deckscale', function(event) {
+      var isKey = event.which === options.keys.scale;
+      isKey = isKey || $.inArray(event.which, options.keys.scale) > -1;
+      if (isKey) {
+        $.deck('toggleScale');
+        event.preventDefault();
+      }
+    });
+  };
+
+  /*
+  Extends defaults/options.
+
+  options.classes.scale
+    This class is added to the deck container when scaling is enabled.
+    It is enabled by default when the module is included.
+
+  options.classes.scaleSlideWrapper
+    Scaling is done using a wrapper around the contents of each slide. This
+    class is applied to that wrapper.
+
+  options.keys.scale
+    The numeric keycode used to toggle enabling and disabling scaling.
+
+  options.baseHeight
+    When baseHeight is falsy, as it is by default, the deck is scaled in
+    proportion to the height of the deck container. You may instead specify
+    a height as a number of px, and slides will be scaled against this
+    height regardless of the container size.
+
+  options.scaleDebounce
+    Scaling on the browser resize event is debounced. This number is the
+    threshold in milliseconds. You can learn more about debouncing here:
+    http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+
+  */
+  $.extend(true, $.deck.defaults, {
+    classes: {
+      scale: 'deck-scale',
+      scaleSlideWrapper: 'deck-slide-scaler'
+    },
+
+    keys: {
+      scale: 83 // s
+    },
+
+    baseHeight: null,
+    scaleDebounce: 200
+  });
+
+  /*
+  jQuery.deck('disableScale')
+
+  Disables scaling and removes the scale class from the deck container.
+  */
+  $.deck('extend', 'disableScale', function() {
+    $.deck('getContainer').removeClass($.deck('getOptions').classes.scale);
+    scaleDeck();
+  });
+
+  /*
+  jQuery.deck('enableScale')
+
+  Enables scaling and adds the scale class to the deck container.
+  */
+  $.deck('extend', 'enableScale', function() {
+    $.deck('getContainer').addClass($.deck('getOptions').classes.scale);
+    scaleDeck();
+  });
+
+  /*
+  jQuery.deck('toggleScale')
+
+  Toggles between enabling and disabling scaling.
+  */
+  $.deck('extend', 'toggleScale', function() {
+    var $container = $.deck('getContainer');
+    var isScaled = $container.hasClass($.deck('getOptions').classes.scale);
+    $.deck(isScaled? 'disableScale' : 'enableScale');
+  });
+
+  $document.bind('deck.init', function() {
+    populateRootSlides();
+    wrapRootSlideContent();
+    scaleOnResizeAndLoad();
+    bindKeyEvents();
+  });
+})(jQuery, 'deck', this);
 
-        rootId = rootId || "impress";
-
-        // If given root is already initialized just return the API
-        if ( roots[ "impress-root-" + rootId ] ) {
-            return roots[ "impress-root-" + rootId ];
-        }
-
-        // Data of all presentation steps
-        var stepsData = {};
-
-        // Element of currently active step
-        var activeStep = null;
-
-        // Current state (position, rotation and scale) of the presentation
-        var currentState = null;
-
-        // Array of step elements
-        var steps = null;
-
-        // Configuration options
-        var config = null;
-
-        // Scale factor of the browser window
-        var windowScale = null;
-
-        // Root presentation elements
-        var root = byId( rootId );
-        var canvas = document.createElement( "div" );
-
-        var initialized = false;
-
-        // STEP EVENTS
-        //
-        // There are currently two step events triggered by impress.js
-        // `impress:stepenter` is triggered when the step is shown on the
-        // screen (the transition from the previous one is finished) and
-        // `impress:stepleave` is triggered when the step is left (the
-        // transition to next step just starts).
-
-        // Reference to last entered step
-        var lastEntered = null;
-
-        // `onStepEnter` is called whenever the step element is entered
-        // but the event is triggered only if the step is different than
-        // last entered step.
-        var onStepEnter = function( step ) {
-            if ( lastEntered !== step ) {
-                triggerEvent( step, "impress:stepenter" );
-                lastEntered = step;
-            }
-        };
-
-        // `onStepLeave` is called whenever the step element is left
-        // but the event is triggered only if the step is the same as
-        // last entered step.
-        var onStepLeave = function( step ) {
-            if ( lastEntered === step ) {
-                triggerEvent( step, "impress:stepleave" );
-                lastEntered = null;
-            }
-        };
-
-        // `initStep` initializes given step element by reading data from its
-        // data attributes and setting correct styles.
-        var initStep = function( el, idx ) {
-            var data = el.dataset,
-                step = {
-                    translate: {
-                        x: toNumber( data.x ),
-                        y: toNumber( data.y ),
-                        z: toNumber( data.z )
-                    },
-                    rotate: {
-                        x: toNumber( data.rotateX ),
-                        y: toNumber( data.rotateY ),
-                        z: toNumber( data.rotateZ || data.rotate )
-                    },
-                    scale: toNumber( data.scale, 1 ),
-                    el: el
-                };
-
-            if ( !el.id ) {
-                el.id = "step-" + ( idx + 1 );
-            }
-
-            stepsData[ "impress-" + el.id ] = step;
-
-            css( el, {
-                position: "absolute",
-                transform: "translate(-50%,-50%)" +
-                           translate( step.translate ) +
-                           rotate( step.rotate ) +
-                           scale( step.scale ),
-                transformStyle: "preserve-3d"
-            } );
-        };
-
-        // `init` API function that initializes (and runs) the presentation.
-        var init = function() {
-            if ( initialized ) { return; }
-
-            // First we set up the viewport for mobile devices.
-            // For some reason iPad goes nuts when it is not done properly.
-            var meta = $( "meta[name='viewport']" ) || document.createElement( "meta" );
-            meta.content = "width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no";
-            if ( meta.parentNode !== document.head ) {
-                meta.name = "viewport";
-                document.head.appendChild( meta );
-            }
-
-            // Initialize configuration object
-            var rootData = root.dataset;
-            config = {
-                width: toNumber( rootData.width, defaults.width ),
-                height: toNumber( rootData.height, defaults.height ),
-                maxScale: toNumber( rootData.maxScale, defaults.maxScale ),
-                minScale: toNumber( rootData.minScale, defaults.minScale ),
-                perspective: toNumber( rootData.perspective, defaults.perspective ),
-                transitionDuration: toNumber(
-                  rootData.transitionDuration, defaults.transitionDuration
-                )
-            };
-
-            windowScale = computeWindowScale( config );
-
-            // Wrap steps with "canvas" element
-            arrayify( root.childNodes ).forEach( function( el ) {
-                canvas.appendChild( el );
-            } );
-            root.appendChild( canvas );
-
-            // Set initial styles
-            document.documentElement.style.height = "100%";
-
-            css( body, {
-                height: "100%",
-                overflow: "hidden"
-            } );
-
-            var rootStyles = {
-                position: "absolute",
-                transformOrigin: "top left",
-                transition: "all 0s ease-in-out",
-                transformStyle: "preserve-3d"
-            };
-
-            css( root, rootStyles );
-            css( root, {
-                top: "50%",
-                left: "50%",
-                transform: perspective( config.perspective / windowScale ) + scale( windowScale )
-            } );
-            css( canvas, rootStyles );
-
-            body.classList.remove( "impress-disabled" );
-            body.classList.add( "impress-enabled" );
-
-            // Get and init steps
-            steps = $$( ".step", root );
-            steps.forEach( initStep );
-
-            // Set a default initial state of the canvas
-            currentState = {
-                translate: { x: 0, y: 0, z: 0 },
-                rotate:    { x: 0, y: 0, z: 0 },
-                scale:     1
-            };
-
-            initialized = true;
-
-            triggerEvent( root, "impress:init", { api: roots[ "impress-root-" + rootId ] } );
-        };
-
-        // `getStep` is a helper function that returns a step element defined by parameter.
-        // If a number is given, step with index given by the number is returned, if a string
-        // is given step element with such id is returned, if DOM element is given it is returned
-        // if it is a correct step element.
-        var getStep = function( step ) {
-            if ( typeof step === "number" ) {
-                step = step < 0 ? steps[ steps.length + step ] : steps[ step ];
-            } else if ( typeof step === "string" ) {
-                step = byId( step );
-            }
-            return ( step && step.id && stepsData[ "impress-" + step.id ] ) ? step : null;
-        };
-
-        // Used to reset timeout for `impress:stepenter` event
-        var stepEnterTimeout = null;
-
-        // `goto` API function that moves to step given with `el` parameter
-        // (by index, id or element), with a transition `duration` optionally
-        // given as second parameter.
-        var goto = function( el, duration ) {
-
-            if ( !initialized || !( el = getStep( el ) ) ) {
-
-                // Presentation not initialized or given element is not a step
-                return false;
-            }
-
-            // Sometimes it's possible to trigger focus on first link with some keyboard action.
-            // Browser in such a case tries to scroll the page to make this element visible
-            // (even that body overflow is set to hidden) and it breaks our careful positioning.
-            //
-            // So, as a lousy (and lazy) workaround we will make the page scroll back to the top
-            // whenever slide is selected
-            //
-            // If you are reading this and know any better way to handle it, I'll be glad to hear
-            // about it!
-            window.scrollTo( 0, 0 );
-
-            var step = stepsData[ "impress-" + el.id ];
-
-            if ( activeStep ) {
-                activeStep.classList.remove( "active" );
-                body.classList.remove( "impress-on-" + activeStep.id );
-            }
-            el.classList.add( "active" );
-
-            body.classList.add( "impress-on-" + el.id );
-
-            // Compute target state of the canvas based on given step
-            var target = {
-                rotate: {
-                    x: -step.rotate.x,
-                    y: -step.rotate.y,
-                    z: -step.rotate.z
-                },
-                translate: {
-                    x: -step.translate.x,
-                    y: -step.translate.y,
-                    z: -step.translate.z
-                },
-                scale: 1 / step.scale
-            };
-
-            // Check if the transition is zooming in or not.
-            //
-            // This information is used to alter the transition style:
-            // when we are zooming in - we start with move and rotate transition
-            // and the scaling is delayed, but when we are zooming out we start
-            // with scaling down and move and rotation are delayed.
-            var zoomin = target.scale >= currentState.scale;
-
-            duration = toNumber( duration, config.transitionDuration );
-            var delay = ( duration / 2 );
-
-            // If the same step is re-selected, force computing window scaling,
-            // because it is likely to be caused by window resize
-            if ( el === activeStep ) {
-                windowScale = computeWindowScale( config );
-            }
-
-            var targetScale = target.scale * windowScale;
-
-            // Trigger leave of currently active element (if it's not the same step again)
-            if ( activeStep && activeStep !== el ) {
-                onStepLeave( activeStep );
-            }
-
-            // Now we alter transforms of `root` and `canvas` to trigger transitions.
-            //
-            // And here is why there are two elements: `root` and `canvas` - they are
-            // being animated separately:
-            // `root` is used for scaling and `canvas` for translate and rotations.
-            // Transitions on them are triggered with different delays (to make
-            // visually nice and 'natural' looking transitions), so we need to know
-            // that both of them are finished.
-            css( root, {
-
-                // To keep the perspective look similar for different scales
-                // we need to 'scale' the perspective, too
-                transform: perspective( config.perspective / targetScale ) + scale( targetScale ),
-                transitionDuration: duration + "ms",
-                transitionDelay: ( zoomin ? delay : 0 ) + "ms"
-            } );
-
-            css( canvas, {
-                transform: rotate( target.rotate, true ) + translate( target.translate ),
-                transitionDuration: duration + "ms",
-                transitionDelay: ( zoomin ? 0 : delay ) + "ms"
-            } );
-
-            // Here is a tricky part...
-            //
-            // If there is no change in scale or no change in rotation and translation, it means
-            // there was actually no delay - because there was no transition on `root` or `canvas`
-            // elements. We want to trigger `impress:stepenter` event in the correct moment, so
-            // here we compare the current and target values to check if delay should be taken into
-            // account.
-            //
-            // I know that this `if` statement looks scary, but it's pretty simple when you know
-            // what is going on
-            // - it's simply comparing all the values.
-            if ( currentState.scale === target.scale ||
-                ( currentState.rotate.x === target.rotate.x &&
-                  currentState.rotate.y === target.rotate.y &&
-                  currentState.rotate.z === target.rotate.z &&
-                  currentState.translate.x === target.translate.x &&
-                  currentState.translate.y === target.translate.y &&
-                  currentState.translate.z === target.translate.z ) ) {
-                delay = 0;
-            }
-
-            // Store current state
-            currentState = target;
-            activeStep = el;
-
-            // And here is where we trigger `impress:stepenter` event.
-            // We simply set up a timeout to fire it taking transition duration
-            // (and possible delay) into account.
-            //
-            // I really wanted to make it in more elegant way. The `transitionend` event seemed to
-            // be the best way to do it, but the fact that I'm using transitions on two separate
-            // elements and that the `transitionend` event is only triggered when there was a
-            // transition (change in the values) caused some bugs and made the code really
-            // complicated, cause I had to handle all the conditions separately. And it still
-            // needed a `setTimeout` fallback for the situations when there is no transition at
-            // all.
-            // So I decided that I'd rather make the code simpler than use shiny new
-            // `transitionend`.
-            //
-            // If you want learn something interesting and see how it was done with `transitionend`
-            // go back to
-            // version 0.5.2 of impress.js:
-            // http://github.com/bartaz/impress.js/blob/0.5.2/js/impress.js
-            window.clearTimeout( stepEnterTimeout );
-            stepEnterTimeout = window.setTimeout( function() {
-                onStepEnter( activeStep );
-            }, duration + delay );
-
-            return el;
-        };
-
-        // `prev` API function goes to previous step (in document order)
-        var prev = function() {
-            var prev = steps.indexOf( activeStep ) - 1;
-            prev = prev >= 0 ? steps[ prev ] : steps[ steps.length - 1 ];
-
-            return goto( prev );
-        };
-
-        // `next` API function goes to next step (in document order)
-        var next = function() {
-            var next = steps.indexOf( activeStep ) + 1;
-            next = next < steps.length ? steps[ next ] : steps[ 0 ];
-
-            return goto( next );
-        };
-
-        // Adding some useful classes to step elements.
-        //
-        // All the steps that have not been shown yet are given `future` class.
-        // When the step is entered the `future` class is removed and the `present`
-        // class is given. When the step is left `present` class is replaced with
-        // `past` class.
-        //
-        // So every step element is always in one of three possible states:
-        // `future`, `present` and `past`.
-        //
-        // There classes can be used in CSS to style different types of steps.
-        // For example the `present` class can be used to trigger some custom
-        // animations when step is shown.
-        root.addEventListener( "impress:init", function() {
-
-            // STEP CLASSES
-            steps.forEach( function( step ) {
-                step.classList.add( "future" );
-            } );
-
-            root.addEventListener( "impress:stepenter", function( event ) {
-                event.target.classList.remove( "past" );
-                event.target.classList.remove( "future" );
-                event.target.classList.add( "present" );
-            }, false );
-
-            root.addEventListener( "impress:stepleave", function( event ) {
-                event.target.classList.remove( "present" );
-                event.target.classList.add( "past" );
-            }, false );
-
-        }, false );
-
-        // Adding hash change support.
-        root.addEventListener( "impress:init", function() {
-
-            // Last hash detected
-            var lastHash = "";
-
-            // `#/step-id` is used instead of `#step-id` to prevent default browser
-            // scrolling to element in hash.
-            //
-            // And it has to be set after animation finishes, because in Chrome it
-            // makes transtion laggy.
-            // BUG: http://code.google.com/p/chromium/issues/detail?id=62820
-            root.addEventListener( "impress:stepenter", function( event ) {
-                window.location.hash = lastHash = "#/" + event.target.id;
-            }, false );
-
-            window.addEventListener( "hashchange", function() {
-
-                // When the step is entered hash in the location is updated
-                // (just few lines above from here), so the hash change is
-                // triggered and we would call `goto` again on the same element.
-                //
-                // To avoid this we store last entered hash and compare.
-                if ( window.location.hash !== lastHash ) {
-                    goto( getElementFromHash() );
-                }
-            }, false );
-
-            // START
-            // by selecting step defined in url or first step of the presentation
-            goto( getElementFromHash() || steps[ 0 ], 0 );
-        }, false );
-
-        body.classList.add( "impress-disabled" );
-
-        // Store and return API for given impress.js root element
-        return ( roots[ "impress-root-" + rootId ] = {
-            init: init,
-            goto: goto,
-            next: next,
-            prev: prev
-        } );
-
-    };
-
-    // Flag that can be used in JS to check if browser have passed the support test
-    impress.supported = impressSupported;
-
-} )( document, window );
-
-// NAVIGATION EVENTS
-
-// As you can see this part is separate from the impress.js core code.
-// It's because these navigation actions only need what impress.js provides with
-// its simple API.
-//
-// In future I think about moving it to make them optional, move to separate files
-// and treat more like a 'plugins'.
-( function( document, window ) {
-    "use strict";
-
-    // Throttling function calls, by Remy Sharp
-    // http://remysharp.com/2010/07/21/throttling-function-calls/
-    var throttle = function( fn, delay ) {
-        var timer = null;
-        return function() {
-            var context = this, args = arguments;
-            clearTimeout( timer );
-            timer = setTimeout( function() {
-                fn.apply( context, args );
-            }, delay );
-        };
-    };
-
-    // Wait for impress.js to be initialized
-    document.addEventListener( "impress:init", function( event ) {
-
-        // Getting API from event data.
-        // So you don't event need to know what is the id of the root element
-        // or anything. `impress:init` event data gives you everything you
-        // need to control the presentation that was just initialized.
-        var api = event.detail.api;
-
-        // KEYBOARD NAVIGATION HANDLERS
-
-        // Prevent default keydown action when one of supported key is pressed.
-        document.addEventListener( "keydown", function( event ) {
-            if ( event.keyCode === 9 ||
-               ( event.keyCode >= 32 && event.keyCode <= 34 ) ||
-               ( event.keyCode >= 37 && event.keyCode <= 40 ) ) {
-                event.preventDefault();
-            }
-        }, false );
-
-        // Trigger impress action (next or prev) on keyup.
-
-        // Supported keys are:
-        // [space] - quite common in presentation software to move forward
-        // [up] [right] / [down] [left] - again common and natural addition,
-        // [pgdown] / [pgup] - often triggered by remote controllers,
-        // [tab] - this one is quite controversial, but the reason it ended up on
-        //   this list is quite an interesting story... Remember that strange part
-        //   in the impress.js code where window is scrolled to 0,0 on every presentation
-        //   step, because sometimes browser scrolls viewport because of the focused element?
-        //   Well, the [tab] key by default navigates around focusable elements, so clicking
-        //   it very often caused scrolling to focused element and breaking impress.js
-        //   positioning. I didn't want to just prevent this default action, so I used [tab]
-        //   as another way to moving to next step... And yes, I know that for the sake of
-        //   consistency I should add [shift+tab] as opposite action...
-        document.addEventListener( "keyup", function( event ) {
-
-            if ( event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ) {
-                return;
-            }
-
-            if ( event.keyCode === 9 ||
-               ( event.keyCode >= 32 && event.keyCode <= 34 ) ||
-               ( event.keyCode >= 37 && event.keyCode <= 40 ) ) {
-                switch ( event.keyCode ) {
-                    case 33: // Page up
-                    case 37: // Left
-                    case 38: // Up
-                             api.prev();
-                             break;
-                    case 9:  // Tab
-                    case 32: // Space
-                    case 34: // Page down
-                    case 39: // Right
-                    case 40: // Down
-                             api.next();
-                             break;
-                }
-
-                event.preventDefault();
-            }
-        }, false );
-
-        // Delegated handler for clicking on the links to presentation steps
-        document.addEventListener( "click", function( event ) {
-
-            // Event delegation with "bubbling"
-            // Check if event target (or any of its parents is a link)
-            var target = event.target;
-            while ( ( target.tagName !== "A" ) &&
-                    ( target !== document.documentElement ) ) {
-                target = target.parentNode;
-            }
-
-            if ( target.tagName === "A" ) {
-                var href = target.getAttribute( "href" );
-
-                // If it's a link to presentation step, target this step
-                if ( href && href[ 0 ] === "#" ) {
-                    target = document.getElementById( href.slice( 1 ) );
-                }
-            }
-
-            if ( api.goto( target ) ) {
-                event.stopImmediatePropagation();
-                event.preventDefault();
-            }
-        }, false );
-
-        // Delegated handler for clicking on step elements
-        document.addEventListener( "click", function( event ) {
-            var target = event.target;
-
-            // Find closest step element that is not active
-            while ( !( target.classList.contains( "step" ) &&
-                      !target.classList.contains( "active" ) ) &&
-                      ( target !== document.documentElement ) ) {
-                target = target.parentNode;
-            }
-
-            if ( api.goto( target ) ) {
-                event.preventDefault();
-            }
-        }, false );
-
-        // Touch handler to detect taps on the left and right side of the screen
-        // based on awesome work of @hakimel: https://github.com/hakimel/reveal.js
-        document.addEventListener( "touchstart", function( event ) {
-            if ( event.touches.length === 1 ) {
-                var x = event.touches[ 0 ].clientX,
-                    width = window.innerWidth * 0.3,
-                    result = null;
-
-                if ( x < width ) {
-                    result = api.prev();
-                } else if ( x > window.innerWidth - width ) {
-                    result = api.next();
-                }
-
-                if ( result ) {
-                    event.preventDefault();
-                }
-            }
-        }, false );
-
-        // Rescale presentation when window is resized
-        window.addEventListener( "resize", throttle( function() {
-
-            // Force going to active step again, to trigger rescaling
-            api.goto( document.querySelector( ".step.active" ), 500 );
-        }, 250 ), false );
-
-    }, false );
-
-} )( document, window );
-
-// THAT'S ALL FOLKS!
-//
-// Thanks for reading it all.
-// Or thanks for scrolling down and reading the last part.
-//
-// I've learnt a lot when building impress.js and I hope this code and comments
-// will help somebody learn at least some part of it.
 
 /*! highlight.js v9.6.0 | BSD3 License | git.io/hljslicense */
 !function(e){var t="object"==typeof window&&window||"object"==typeof self&&self;"undefined"!=typeof exports?e(exports):t&&(t.hljs=e({}),"function"==typeof define&&define.amd&&define([],function(){return t.hljs}))}(function(e){function t(e){return e.replace(/[&<>]/gm,function(e){return L[e]})}function r(e){return e.nodeName.toLowerCase()}function a(e,t){var r=e&&e.exec(t);return r&&0===r.index}function n(e){return C.test(e)}function i(e){var t,r,a,i,s=e.className+" ";if(s+=e.parentNode?e.parentNode.className:"",r=E.exec(s))return y(r[1])?r[1]:"no-highlight";for(s=s.split(/\s+/),t=0,a=s.length;a>t;t++)if(i=s[t],n(i)||y(i))return i}function s(e,t){var r,a={};for(r in e)a[r]=e[r];if(t)for(r in t)a[r]=t[r];return a}function c(e){var t=[];return function a(e,n){for(var i=e.firstChild;i;i=i.nextSibling)3===i.nodeType?n+=i.nodeValue.length:1===i.nodeType&&(t.push({event:"start",offset:n,node:i}),n=a(i,n),r(i).match(/br|hr|img|input/)||t.push({event:"stop",offset:n,node:i}));return n}(e,0),t}function o(e,a,n){function i(){return e.length&&a.length?e[0].offset!==a[0].offset?e[0].offset<a[0].offset?e:a:"start"===a[0].event?e:a:e.length?e:a}function s(e){function a(e){return" "+e.nodeName+'="'+t(e.value)+'"'}u+="<"+r(e)+w.map.call(e.attributes,a).join("")+">"}function c(e){u+="</"+r(e)+">"}function o(e){("start"===e.event?s:c)(e.node)}for(var l=0,u="",d=[];e.length||a.length;){var b=i();if(u+=t(n.substr(l,b[0].offset-l)),l=b[0].offset,b===e){d.reverse().forEach(c);do o(b.splice(0,1)[0]),b=i();while(b===e&&b.length&&b[0].offset===l);d.reverse().forEach(s)}else"start"===b[0].event?d.push(b[0].node):d.pop(),o(b.splice(0,1)[0])}return u+t(n.substr(l))}function l(e){function t(e){return e&&e.source||e}function r(r,a){return new RegExp(t(r),"m"+(e.cI?"i":"")+(a?"g":""))}function a(n,i){if(!n.compiled){if(n.compiled=!0,n.k=n.k||n.bK,n.k){var c={},o=function(t,r){e.cI&&(r=r.toLowerCase()),r.split(" ").forEach(function(e){var r=e.split("|");c[r[0]]=[t,r[1]?Number(r[1]):1]})};"string"==typeof n.k?o("keyword",n.k):N(n.k).forEach(function(e){o(e,n.k[e])}),n.k=c}n.lR=r(n.l||/\w+/,!0),i&&(n.bK&&(n.b="\\b("+n.bK.split(" ").join("|")+")\\b"),n.b||(n.b=/\B|\b/),n.bR=r(n.b),n.e||n.eW||(n.e=/\B|\b/),n.e&&(n.eR=r(n.e)),n.tE=t(n.e)||"",n.eW&&i.tE&&(n.tE+=(n.e?"|":"")+i.tE)),n.i&&(n.iR=r(n.i)),null==n.r&&(n.r=1),n.c||(n.c=[]);var l=[];n.c.forEach(function(e){e.v?e.v.forEach(function(t){l.push(s(e,t))}):l.push("self"===e?n:e)}),n.c=l,n.c.forEach(function(e){a(e,n)}),n.starts&&a(n.starts,i);var u=n.c.map(function(e){return e.bK?"\\.?("+e.b+")\\.?":e.b}).concat([n.tE,n.i]).map(t).filter(Boolean);n.t=u.length?r(u.join("|"),!0):{exec:function(){return null}}}}a(e)}function u(e,r,n,i){function s(e,t){var r,n;for(r=0,n=t.c.length;n>r;r++)if(a(t.c[r].bR,e))return t.c[r]}function c(e,t){if(a(e.eR,t)){for(;e.endsParent&&e.parent;)e=e.parent;return e}return e.eW?c(e.parent,t):void 0}function o(e,t){return!n&&a(t.iR,e)}function b(e,t){var r=v.cI?t[0].toLowerCase():t[0];return e.k.hasOwnProperty(r)&&e.k[r]}function p(e,t,r,a){var n=a?"":R.classPrefix,i='<span class="'+n,s=r?"":B;return i+=e+'">',i+t+s}function m(){var e,r,a,n;if(!N.k)return t(E);for(n="",r=0,N.lR.lastIndex=0,a=N.lR.exec(E);a;)n+=t(E.substr(r,a.index-r)),e=b(N,a),e?(M+=e[1],n+=p(e[0],t(a[0]))):n+=t(a[0]),r=N.lR.lastIndex,a=N.lR.exec(E);return n+t(E.substr(r))}function f(){var e="string"==typeof N.sL;if(e&&!k[N.sL])return t(E);var r=e?u(N.sL,E,!0,x[N.sL]):d(E,N.sL.length?N.sL:void 0);return N.r>0&&(M+=r.r),e&&(x[N.sL]=r.top),p(r.language,r.value,!1,!0)}function g(){C+=null!=N.sL?f():m(),E=""}function _(e){C+=e.cN?p(e.cN,"",!0):"",N=Object.create(e,{parent:{value:N}})}function h(e,t){if(E+=e,null==t)return g(),0;var r=s(t,N);if(r)return r.skip?E+=t:(r.eB&&(E+=t),g(),r.rB||r.eB||(E=t)),_(r,t),r.rB?0:t.length;var a=c(N,t);if(a){var n=N;n.skip?E+=t:(n.rE||n.eE||(E+=t),g(),n.eE&&(E=t));do N.cN&&(C+=B),N.skip||(M+=N.r),N=N.parent;while(N!==a.parent);return a.starts&&_(a.starts,""),n.rE?0:t.length}if(o(t,N))throw new Error('Illegal lexeme "'+t+'" for mode "'+(N.cN||"<unnamed>")+'"');return E+=t,t.length||1}var v=y(e);if(!v)throw new Error('Unknown language: "'+e+'"');l(v);var w,N=i||v,x={},C="";for(w=N;w!==v;w=w.parent)w.cN&&(C=p(w.cN,"",!0)+C);var E="",M=0;try{for(var L,S,A=0;;){if(N.t.lastIndex=A,L=N.t.exec(r),!L)break;S=h(r.substr(A,L.index-A),L[0]),A=L.index+S}for(h(r.substr(A)),w=N;w.parent;w=w.parent)w.cN&&(C+=B);return{r:M,value:C,language:e,top:N}}catch($){if($.message&&-1!==$.message.indexOf("Illegal"))return{r:0,value:t(r)};throw $}}function d(e,r){r=r||R.languages||N(k);var a={r:0,value:t(e)},n=a;return r.filter(y).forEach(function(t){var r=u(t,e,!1);r.language=t,r.r>n.r&&(n=r),r.r>a.r&&(n=a,a=r)}),n.language&&(a.second_best=n),a}function b(e){return R.tabReplace||R.useBR?e.replace(M,function(e,t){return R.useBR&&"\n"===e?"<br>":R.tabReplace?t.replace(/\t/g,R.tabReplace):void 0}):e}function p(e,t,r){var a=t?x[t]:r,n=[e.trim()];return e.match(/\bhljs\b/)||n.push("hljs"),-1===e.indexOf(a)&&n.push(a),n.join(" ").trim()}function m(e){var t,r,a,s,l,m=i(e);n(m)||(R.useBR?(t=document.createElementNS("http://www.w3.org/1999/xhtml","div"),t.innerHTML=e.innerHTML.replace(/\n/g,"").replace(/<br[ \/]*>/g,"\n")):t=e,l=t.textContent,a=m?u(m,l,!0):d(l),r=c(t),r.length&&(s=document.createElementNS("http://www.w3.org/1999/xhtml","div"),s.innerHTML=a.value,a.value=o(r,c(s),l)),a.value=b(a.value),e.innerHTML=a.value,e.className=p(e.className,m,a.language),e.result={language:a.language,re:a.r},a.second_best&&(e.second_best={language:a.second_best.language,re:a.second_best.r}))}function f(e){R=s(R,e)}function g(){if(!g.called){g.called=!0;var e=document.querySelectorAll("pre code");w.forEach.call(e,m)}}function _(){addEventListener("DOMContentLoaded",g,!1),addEventListener("load",g,!1)}function h(t,r){var a=k[t]=r(e);a.aliases&&a.aliases.forEach(function(e){x[e]=t})}function v(){return N(k)}function y(e){return e=(e||"").toLowerCase(),k[e]||k[x[e]]}var w=[],N=Object.keys,k={},x={},C=/^(no-?highlight|plain|text)$/i,E=/\blang(?:uage)?-([\w-]+)\b/i,M=/((^(<[^>]+>|\t|)+|(?:\n)))/gm,B="</span>",R={classPrefix:"hljs-",tabReplace:null,useBR:!1,languages:void 0},L={"&":"&amp;","<":"&lt;",">":"&gt;"};return e.highlight=u,e.highlightAuto=d,e.fixMarkup=b,e.highlightBlock=m,e.configure=f,e.initHighlighting=g,e.initHighlightingOnLoad=_,e.registerLanguage=h,e.listLanguages=v,e.getLanguage=y,e.inherit=s,e.IR="[a-zA-Z]\\w*",e.UIR="[a-zA-Z_]\\w*",e.NR="\\b\\d+(\\.\\d+)?",e.CNR="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",e.BNR="\\b(0b[01]+)",e.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",e.BE={b:"\\\\[\\s\\S]",r:0},e.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[e.BE]},e.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[e.BE]},e.PWM={b:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|like)\b/},e.C=function(t,r,a){var n=e.inherit({cN:"comment",b:t,e:r,c:[]},a||{});return n.c.push(e.PWM),n.c.push({cN:"doctag",b:"(?:TODO|FIXME|NOTE|BUG|XXX):",r:0}),n},e.CLCM=e.C("//","$"),e.CBCM=e.C("/\\*","\\*/"),e.HCM=e.C("#","$"),e.NM={cN:"number",b:e.NR,r:0},e.CNM={cN:"number",b:e.CNR,r:0},e.BNM={cN:"number",b:e.BNR,r:0},e.CSSNM={cN:"number",b:e.NR+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",r:0},e.RM={cN:"regexp",b:/\//,e:/\/[gimuy]*/,i:/\n/,c:[e.BE,{b:/\[/,e:/\]/,r:0,c:[e.BE]}]},e.TM={cN:"title",b:e.IR,r:0},e.UTM={cN:"title",b:e.UIR,r:0},e.METHOD_GUARD={b:"\\.\\s*"+e.UIR,r:0},e.registerLanguage("apache",function(e){var t={cN:"number",b:"[\\$%]\\d+"};return{aliases:["apacheconf"],cI:!0,c:[e.HCM,{cN:"section",b:"</?",e:">"},{cN:"attribute",b:/\w+/,r:0,k:{nomarkup:"order deny allow setenv rewriterule rewriteengine rewritecond documentroot sethandler errordocument loadmodule options header listen serverroot servername"},starts:{e:/$/,r:0,k:{literal:"on off all"},c:[{cN:"meta",b:"\\s\\[",e:"\\]$"},{cN:"variable",b:"[\\$%]\\{",e:"\\}",c:["self",t]},t,e.QSM]}}],i:/\S/}}),e.registerLanguage("bash",function(e){var t={cN:"variable",v:[{b:/\$[\w\d#@][\w\d_]*/},{b:/\$\{(.*?)}/}]},r={cN:"string",b:/"/,e:/"/,c:[e.BE,t,{cN:"variable",b:/\$\(/,e:/\)/,c:[e.BE]}]},a={cN:"string",b:/'/,e:/'/};return{aliases:["sh","zsh"],l:/-?[a-z\._]+/,k:{keyword:"if then else elif fi for while in do done case esac function",literal:"true false",built_in:"break cd continue eval exec exit export getopts hash pwd readonly return shift test times trap umask unset alias bind builtin caller command declare echo enable help let local logout mapfile printf read readarray source type typeset ulimit unalias set shopt autoload bg bindkey bye cap chdir clone comparguments compcall compctl compdescribe compfiles compgroups compquote comptags comptry compvalues dirs disable disown echotc echoti emulate fc fg float functions getcap getln history integer jobs kill limit log noglob popd print pushd pushln rehash sched setcap setopt stat suspend ttyctl unfunction unhash unlimit unsetopt vared wait whence where which zcompile zformat zftp zle zmodload zparseopts zprof zpty zregexparse zsocket zstyle ztcp",_:"-ne -eq -lt -gt -f -d -e -s -l -a"},c:[{cN:"meta",b:/^#![^\n]+sh\s*$/,r:10},{cN:"function",b:/\w[\w\d_]*\s*\(\s*\)\s*\{/,rB:!0,c:[e.inherit(e.TM,{b:/\w[\w\d_]*/})],r:0},e.HCM,r,a,t]}}),e.registerLanguage("coffeescript",function(e){var t={keyword:"in if for while finally new do return else break catch instanceof throw try this switch continue typeof delete debugger super then unless until loop of by when and or is isnt not",literal:"true false null undefined yes no on off",built_in:"npm require console print module global window document"},r="[A-Za-z$_][0-9A-Za-z$_]*",a={cN:"subst",b:/#\{/,e:/}/,k:t},n=[e.BNM,e.inherit(e.CNM,{starts:{e:"(\\s*/)?",r:0}}),{cN:"string",v:[{b:/'''/,e:/'''/,c:[e.BE]},{b:/'/,e:/'/,c:[e.BE]},{b:/"""/,e:/"""/,c:[e.BE,a]},{b:/"/,e:/"/,c:[e.BE,a]}]},{cN:"regexp",v:[{b:"///",e:"///",c:[a,e.HCM]},{b:"//[gim]*",r:0},{b:/\/(?![ *])(\\\/|.)*?\/[gim]*(?=\W|$)/}]},{b:"@"+r},{b:"`",e:"`",eB:!0,eE:!0,sL:"javascript"}];a.c=n;var i=e.inherit(e.TM,{b:r}),s="(\\(.*\\))?\\s*\\B[-=]>",c={cN:"params",b:"\\([^\\(]",rB:!0,c:[{b:/\(/,e:/\)/,k:t,c:["self"].concat(n)}]};return{aliases:["coffee","cson","iced"],k:t,i:/\/\*/,c:n.concat([e.C("###","###"),e.HCM,{cN:"function",b:"^\\s*"+r+"\\s*=\\s*"+s,e:"[-=]>",rB:!0,c:[i,c]},{b:/[:\(,=]\s*/,r:0,c:[{cN:"function",b:s,e:"[-=]>",rB:!0,c:[c]}]},{cN:"class",bK:"class",e:"$",i:/[:="\[\]]/,c:[{bK:"extends",eW:!0,i:/[:="\[\]]/,c:[i]},i]},{b:r+":",e:":",rB:!0,rE:!0,r:0}])}}),e.registerLanguage("cpp",function(e){var t={cN:"keyword",b:"\\b[a-z\\d_]*_t\\b"},r={cN:"string",v:[{b:'(u8?|U)?L?"',e:'"',i:"\\n",c:[e.BE]},{b:'(u8?|U)?R"',e:'"',c:[e.BE]},{b:"'\\\\?.",e:"'",i:"."}]},a={cN:"number",v:[{b:"\\b(0b[01'_]+)"},{b:"\\b([\\d'_]+(\\.[\\d'_]*)?|\\.[\\d'_]+)(u|U|l|L|ul|UL|f|F|b|B)"},{b:"(-?)(\\b0[xX][a-fA-F0-9'_]+|(\\b[\\d'_]+(\\.[\\d'_]*)?|\\.[\\d'_]+)([eE][-+]?[\\d'_]+)?)"}],r:0},n={cN:"meta",b:/#\s*[a-z]+\b/,e:/$/,k:{"meta-keyword":"if else elif endif define undef warning error line pragma ifdef ifndef include"},c:[{b:/\\\n/,r:0},e.inherit(r,{cN:"meta-string"}),{cN:"meta-string",b:"<",e:">",i:"\\n"},e.CLCM,e.CBCM]},i=e.IR+"\\s*\\(",s={keyword:"int float while private char catch import module export virtual operator sizeof dynamic_cast|10 typedef const_cast|10 const struct for static_cast|10 union namespace unsigned long volatile static protected bool template mutable if public friend do goto auto void enum else break extern using class asm case typeid short reinterpret_cast|10 default double register explicit signed typename try this switch continue inline delete alignof constexpr decltype noexcept static_assert thread_local restrict _Bool complex _Complex _Imaginary atomic_bool atomic_char atomic_schar atomic_uchar atomic_short atomic_ushort atomic_int atomic_uint atomic_long atomic_ulong atomic_llong atomic_ullong new throw return",built_in:"std string cin cout cerr clog stdin stdout stderr stringstream istringstream ostringstream auto_ptr deque list queue stack vector map set bitset multiset multimap unordered_set unordered_map unordered_multiset unordered_multimap array shared_ptr abort abs acos asin atan2 atan calloc ceil cosh cos exit exp fabs floor fmod fprintf fputs free frexp fscanf isalnum isalpha iscntrl isdigit isgraph islower isprint ispunct isspace isupper isxdigit tolower toupper labs ldexp log10 log malloc realloc memchr memcmp memcpy memset modf pow printf putchar puts scanf sinh sin snprintf sprintf sqrt sscanf strcat strchr strcmp strcpy strcspn strlen strncat strncmp strncpy strpbrk strrchr strspn strstr tanh tan vfprintf vprintf vsprintf endl initializer_list unique_ptr",literal:"true false nullptr NULL"},c=[t,e.CLCM,e.CBCM,a,r];return{aliases:["c","cc","h","c++","h++","hpp"],k:s,i:"</",c:c.concat([n,{b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:s,c:["self",t]},{b:e.IR+"::",k:s},{v:[{b:/=/,e:/;/},{b:/\(/,e:/\)/},{bK:"new throw return else",e:/;/}],k:s,c:c.concat([{b:/\(/,e:/\)/,k:s,c:c.concat(["self"]),r:0}]),r:0},{cN:"function",b:"("+e.IR+"[\\*&\\s]+)+"+i,rB:!0,e:/[{;=]/,eE:!0,k:s,i:/[^\w\s\*&]/,c:[{b:i,rB:!0,c:[e.TM],r:0},{cN:"params",b:/\(/,e:/\)/,k:s,r:0,c:[e.CLCM,e.CBCM,r,a,t]},e.CLCM,e.CBCM,n]}]),exports:{preprocessor:n,strings:r,k:s}}}),e.registerLanguage("cs",function(e){var t={keyword:"abstract as base bool break byte case catch char checked const continue decimal dynamic default delegate do double else enum event explicit extern finally fixed float for foreach goto if implicit in int interface internal is lock long when object operator out override params private protected public readonly ref sbyte sealed short sizeof stackalloc static string struct switch this try typeof uint ulong unchecked unsafe ushort using virtual volatile void while async nameof ascending descending from get group into join let orderby partial select set value var where yield",literal:"null false true"},r={cN:"string",b:'@"',e:'"',c:[{b:'""'}]},a=e.inherit(r,{i:/\n/}),n={cN:"subst",b:"{",e:"}",k:t},i=e.inherit(n,{i:/\n/}),s={cN:"string",b:/\$"/,e:'"',i:/\n/,c:[{b:"{{"},{b:"}}"},e.BE,i]},c={cN:"string",b:/\$@"/,e:'"',c:[{b:"{{"},{b:"}}"},{b:'""'},n]},o=e.inherit(c,{i:/\n/,c:[{b:"{{"},{b:"}}"},{b:'""'},i]});n.c=[c,s,r,e.ASM,e.QSM,e.CNM,e.CBCM],i.c=[o,s,a,e.ASM,e.QSM,e.CNM,e.inherit(e.CBCM,{i:/\n/})];var l={v:[c,s,r,e.ASM,e.QSM]},u=e.IR+"(<"+e.IR+">)?(\\[\\])?";return{aliases:["csharp"],k:t,i:/::/,c:[e.C("///","$",{rB:!0,c:[{cN:"doctag",v:[{b:"///",r:0},{b:"<!--|-->"},{b:"</?",e:">"}]}]}),e.CLCM,e.CBCM,{cN:"meta",b:"#",e:"$",k:{"meta-keyword":"if else elif endif define undef warning error line region endregion pragma checksum"}},l,e.CNM,{bK:"class interface",e:/[{;=]/,i:/[^\s:]/,c:[e.TM,e.CLCM,e.CBCM]},{bK:"namespace",e:/[{;=]/,i:/[^\s:]/,c:[e.inherit(e.TM,{b:"[a-zA-Z](\\.?\\w)*"}),e.CLCM,e.CBCM]},{bK:"new return throw await",r:0},{cN:"function",b:"("+u+"\\s+)+"+e.IR+"\\s*\\(",rB:!0,e:/[{;=]/,eE:!0,k:t,c:[{b:e.IR+"\\s*\\(",rB:!0,c:[e.TM],r:0},{cN:"params",b:/\(/,e:/\)/,eB:!0,eE:!0,k:t,r:0,c:[l,e.CNM,e.CBCM]},e.CLCM,e.CBCM]}]}}),e.registerLanguage("css",function(e){var t="[a-zA-Z-][a-zA-Z0-9_-]*",r={b:/[A-Z\_\.\-]+\s*:/,rB:!0,e:";",eW:!0,c:[{cN:"attribute",b:/\S/,e:":",eE:!0,starts:{eW:!0,eE:!0,c:[{b:/[\w-]+\(/,rB:!0,c:[{cN:"built_in",b:/[\w-]+/},{b:/\(/,e:/\)/,c:[e.ASM,e.QSM]}]},e.CSSNM,e.QSM,e.ASM,e.CBCM,{cN:"number",b:"#[0-9A-Fa-f]+"},{cN:"meta",b:"!important"}]}}]};return{cI:!0,i:/[=\/|'\$]/,c:[e.CBCM,{cN:"selector-id",b:/#[A-Za-z0-9_-]+/},{cN:"selector-class",b:/\.[A-Za-z0-9_-]+/},{cN:"selector-attr",b:/\[/,e:/\]/,i:"$"},{cN:"selector-pseudo",b:/:(:)?[a-zA-Z0-9\_\-\+\(\)"'.]+/},{b:"@(font-face|page)",l:"[a-z-]+",k:"font-face page"},{b:"@",e:"[{;]",i:/:/,c:[{cN:"keyword",b:/\w+/},{b:/\s/,eW:!0,eE:!0,r:0,c:[e.ASM,e.QSM,e.CSSNM]}]},{cN:"selector-tag",b:t,r:0},{b:"{",e:"}",i:/\S/,c:[e.CBCM,r]}]}}),e.registerLanguage("diff",function(e){return{aliases:["patch"],c:[{cN:"meta",r:10,v:[{b:/^@@ +\-\d+,\d+ +\+\d+,\d+ +@@$/},{b:/^\*\*\* +\d+,\d+ +\*\*\*\*$/},{b:/^\-\-\- +\d+,\d+ +\-\-\-\-$/}]},{cN:"comment",v:[{b:/Index: /,e:/$/},{b:/={3,}/,e:/$/},{b:/^\-{3}/,e:/$/},{b:/^\*{3} /,e:/$/},{b:/^\+{3}/,e:/$/},{b:/\*{5}/,e:/\*{5}$/}]},{cN:"addition",b:"^\\+",e:"$"},{cN:"deletion",b:"^\\-",e:"$"},{cN:"addition",b:"^\\!",e:"$"}]}}),e.registerLanguage("http",function(e){var t="HTTP/[0-9\\.]+";return{aliases:["https"],i:"\\S",c:[{b:"^"+t,e:"$",c:[{cN:"number",b:"\\b\\d{3}\\b"}]},{b:"^[A-Z]+ (.*?) "+t+"$",rB:!0,e:"$",c:[{cN:"string",b:" ",e:" ",eB:!0,eE:!0},{b:t},{cN:"keyword",b:"[A-Z]+"}]},{cN:"attribute",b:"^\\w",e:": ",eE:!0,i:"\\n|\\s|=",starts:{e:"$",r:0}},{b:"\\n\\n",starts:{sL:[],eW:!0}}]}}),e.registerLanguage("ini",function(e){var t={cN:"string",c:[e.BE],v:[{b:"'''",e:"'''",r:10},{b:'"""',e:'"""',r:10},{b:'"',e:'"'},{b:"'",e:"'"}]};return{aliases:["toml"],cI:!0,i:/\S/,c:[e.C(";","$"),e.HCM,{cN:"section",b:/^\s*\[+/,e:/\]+/},{b:/^[a-z0-9\[\]_-]+\s*=\s*/,e:"$",rB:!0,c:[{cN:"attr",b:/[a-z0-9\[\]_-]+/},{b:/=/,eW:!0,r:0,c:[{cN:"literal",b:/\bon|off|true|false|yes|no\b/},{cN:"variable",v:[{b:/\$[\w\d"][\w\d_]*/},{b:/\$\{(.*?)}/}]},t,{cN:"number",b:/([\+\-]+)?[\d]+_[\d_]+/},e.NM]}]}]}}),e.registerLanguage("java",function(e){var t=e.UIR+"(<"+e.UIR+"(\\s*,\\s*"+e.UIR+")*>)?",r="false synchronized int abstract float private char boolean static null if const for true while long strictfp finally protected import native final void enum else break transient catch instanceof byte super volatile case assert short package default double public try this switch continue throws protected public private module requires exports",a="\\b(0[bB]([01]+[01_]+[01]+|[01]+)|0[xX]([a-fA-F0-9]+[a-fA-F0-9_]+[a-fA-F0-9]+|[a-fA-F0-9]+)|(([\\d]+[\\d_]+[\\d]+|[\\d]+)(\\.([\\d]+[\\d_]+[\\d]+|[\\d]+))?|\\.([\\d]+[\\d_]+[\\d]+|[\\d]+))([eE][-+]?\\d+)?)[lLfF]?",n={cN:"number",b:a,r:0};return{aliases:["jsp"],k:r,i:/<\/|#/,c:[e.C("/\\*\\*","\\*/",{r:0,c:[{b:/\w+@/,r:0},{cN:"doctag",b:"@[A-Za-z]+"}]}),e.CLCM,e.CBCM,e.ASM,e.QSM,{cN:"class",bK:"class interface",e:/[{;=]/,eE:!0,k:"class interface",i:/[:"\[\]]/,c:[{bK:"extends implements"},e.UTM]},{bK:"new throw return else",r:0},{cN:"function",b:"("+t+"\\s+)+"+e.UIR+"\\s*\\(",rB:!0,e:/[{;=]/,eE:!0,k:r,c:[{b:e.UIR+"\\s*\\(",rB:!0,r:0,c:[e.UTM]},{cN:"params",b:/\(/,e:/\)/,k:r,r:0,c:[e.ASM,e.QSM,e.CNM,e.CBCM]},e.CLCM,e.CBCM]},n,{cN:"meta",b:"@[A-Za-z]+"}]}}),e.registerLanguage("javascript",function(e){return{aliases:["js","jsx"],k:{keyword:"in of if for while finally var new function do return void else break catch instanceof with throw case default try this switch continue typeof delete let yield const export super debugger as async await static import from as",literal:"true false null undefined NaN Infinity",built_in:"eval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Error EvalError InternalError RangeError ReferenceError StopIteration SyntaxError TypeError URIError Number Math Date String RegExp Array Float32Array Float64Array Int16Array Int32Array Int8Array Uint16Array Uint32Array Uint8Array Uint8ClampedArray ArrayBuffer DataView JSON Intl arguments require module console window document Symbol Set Map WeakSet WeakMap Proxy Reflect Promise"},c:[{cN:"meta",r:10,b:/^\s*['"]use (strict|asm)['"]/},{cN:"meta",b:/^#!/,e:/$/},e.ASM,e.QSM,{cN:"string",b:"`",e:"`",c:[e.BE,{cN:"subst",b:"\\$\\{",e:"\\}"}]},e.CLCM,e.CBCM,{cN:"number",v:[{b:"\\b(0[bB][01]+)"},{b:"\\b(0[oO][0-7]+)"},{b:e.CNR}],r:0},{b:"("+e.RSR+"|\\b(case|return|throw)\\b)\\s*",k:"return throw case",c:[e.CLCM,e.CBCM,e.RM,{b:/</,e:/(\/\w+|\w+\/)>/,sL:"xml",c:[{b:/<\w+\s*\/>/,skip:!0},{b:/<\w+/,e:/(\/\w+|\w+\/)>/,skip:!0,c:["self"]}]}],r:0},{cN:"function",bK:"function",e:/\{/,eE:!0,c:[e.inherit(e.TM,{b:/[A-Za-z$_][0-9A-Za-z$_]*/}),{cN:"params",b:/\(/,e:/\)/,eB:!0,eE:!0,c:[e.CLCM,e.CBCM]}],i:/\[|%/},{b:/\$[(.]/},e.METHOD_GUARD,{cN:"class",bK:"class",e:/[{;=]/,eE:!0,i:/[:"\[\]]/,c:[{bK:"extends"},e.UTM]},{bK:"constructor",e:/\{/,eE:!0}],i:/#(?!!)/}}),e.registerLanguage("json",function(e){var t={literal:"true false null"},r=[e.QSM,e.CNM],a={e:",",eW:!0,eE:!0,c:r,k:t},n={b:"{",e:"}",c:[{cN:"attr",b:/"/,e:/"/,c:[e.BE],i:"\\n"},e.inherit(a,{b:/:/})],i:"\\S"},i={b:"\\[",e:"\\]",c:[e.inherit(a)],i:"\\S"};return r.splice(r.length,0,n,i),{c:r,k:t,i:"\\S"}}),e.registerLanguage("makefile",function(e){var t={cN:"variable",b:/\$\(/,e:/\)/,c:[e.BE]};return{aliases:["mk","mak"],c:[e.HCM,{b:/^\w+\s*\W*=/,rB:!0,r:0,starts:{e:/\s*\W*=/,eE:!0,starts:{e:/$/,r:0,c:[t]}}},{cN:"section",b:/^[\w]+:\s*$/},{cN:"meta",b:/^\.PHONY:/,e:/$/,k:{"meta-keyword":".PHONY"},l:/[\.\w]+/},{b:/^\t+/,e:/$/,r:0,c:[e.QSM,t]}]}}),e.registerLanguage("xml",function(e){var t="[A-Za-z0-9\\._:-]+",r={eW:!0,i:/</,r:0,c:[{cN:"attr",b:t,r:0},{b:/=\s*/,r:0,c:[{cN:"string",endsParent:!0,v:[{b:/"/,e:/"/},{b:/'/,e:/'/},{b:/[^\s"'=<>`]+/}]}]}]};return{aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist"],cI:!0,c:[{cN:"meta",b:"<!DOCTYPE",e:">",r:10,c:[{b:"\\[",e:"\\]"}]},e.C("<!--","-->",{r:10}),{b:"<\\!\\[CDATA\\[",e:"\\]\\]>",r:10},{b:/<\?(php)?/,e:/\?>/,sL:"php",c:[{b:"/\\*",e:"\\*/",skip:!0}]},{cN:"tag",b:"<style(?=\\s|>|$)",e:">",k:{name:"style"},c:[r],starts:{e:"</style>",rE:!0,sL:["css","xml"]}},{cN:"tag",b:"<script(?=\\s|>|$)",e:">",k:{name:"script"},c:[r],starts:{e:"</script>",rE:!0,sL:["actionscript","javascript","handlebars","xml"]}},{cN:"meta",v:[{b:/<\?xml/,e:/\?>/,r:10},{b:/<\?\w+/,e:/\?>/}]},{cN:"tag",b:"</?",e:"/?>",c:[{cN:"name",b:/[^\/><\s]+/,r:0},r]}]}}),e.registerLanguage("markdown",function(e){return{aliases:["md","mkdown","mkd"],c:[{cN:"section",v:[{b:"^#{1,6}",e:"$"},{b:"^.+?\\n[=-]{2,}$"}]},{b:"<",e:">",sL:"xml",r:0},{cN:"bullet",b:"^([*+-]|(\\d+\\.))\\s+"},{cN:"strong",b:"[*_]{2}.+?[*_]{2}"},{cN:"emphasis",v:[{b:"\\*.+?\\*"},{b:"_.+?_",r:0}]},{cN:"quote",b:"^>\\s+",e:"$"},{cN:"code",v:[{b:"^```w*s*$",e:"^```s*$"},{b:"`.+?`"},{b:"^( {4}|	)",e:"$",r:0}]},{b:"^[-\\*]{3,}",e:"$"},{b:"\\[.+?\\][\\(\\[].*?[\\)\\]]",rB:!0,c:[{cN:"string",b:"\\[",e:"\\]",eB:!0,rE:!0,r:0},{cN:"link",b:"\\]\\(",e:"\\)",eB:!0,eE:!0},{cN:"symbol",b:"\\]\\[",e:"\\]",eB:!0,eE:!0}],r:10},{b:/^\[[^\n]+\]:/,rB:!0,c:[{cN:"symbol",b:/\[/,e:/\]/,eB:!0,eE:!0},{cN:"link",b:/:\s*/,e:/$/,eB:!0}]}]}}),e.registerLanguage("nginx",function(e){var t={cN:"variable",v:[{b:/\$\d+/},{b:/\$\{/,e:/}/},{b:"[\\$\\@]"+e.UIR}]},r={eW:!0,l:"[a-z/_]+",k:{literal:"on off yes no true false none blocked debug info notice warn error crit select break last permanent redirect kqueue rtsig epoll poll /dev/poll"},r:0,i:"=>",c:[e.HCM,{cN:"string",c:[e.BE,t],v:[{b:/"/,e:/"/},{b:/'/,e:/'/}]},{b:"([a-z]+):/",e:"\\s",eW:!0,eE:!0,c:[t]},{cN:"regexp",c:[e.BE,t],v:[{b:"\\s\\^",e:"\\s|{|;",rE:!0},{b:"~\\*?\\s+",e:"\\s|{|;",rE:!0},{b:"\\*(\\.[a-z\\-]+)+"},{b:"([a-z\\-]+\\.)+\\*"}]},{cN:"number",b:"\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d{1,5})?\\b"},{cN:"number",b:"\\b\\d+[kKmMgGdshdwy]*\\b",r:0},t]};return{aliases:["nginxconf"],c:[e.HCM,{b:e.UIR+"\\s+{",rB:!0,e:"{",c:[{cN:"section",b:e.UIR}],r:0},{b:e.UIR+"\\s",e:";|{",rB:!0,c:[{cN:"attribute",b:e.UIR,starts:r}],r:0}],i:"[^\\s\\}]"}}),e.registerLanguage("objectivec",function(e){var t={cN:"built_in",b:"\\b(AV|CA|CF|CG|CI|CL|CM|CN|CT|MK|MP|MTK|MTL|NS|SCN|SK|UI|WK|XC)\\w+"},r={keyword:"int float while char export sizeof typedef const struct for union unsigned long volatile static bool mutable if do return goto void enum else break extern asm case short default double register explicit signed typename this switch continue wchar_t inline readonly assign readwrite self @synchronized id typeof nonatomic super unichar IBOutlet IBAction strong weak copy in out inout bycopy byref oneway __strong __weak __block __autoreleasing @private @protected @public @try @property @end @throw @catch @finally @autoreleasepool @synthesize @dynamic @selector @optional @required @encode @package @import @defs @compatibility_alias __bridge __bridge_transfer __bridge_retained __bridge_retain __covariant __contravariant __kindof _Nonnull _Nullable _Null_unspecified __FUNCTION__ __PRETTY_FUNCTION__ __attribute__ getter setter retain unsafe_unretained nonnull nullable null_unspecified null_resettable class instancetype NS_DESIGNATED_INITIALIZER NS_UNAVAILABLE NS_REQUIRES_SUPER NS_RETURNS_INNER_POINTER NS_INLINE NS_AVAILABLE NS_DEPRECATED NS_ENUM NS_OPTIONS NS_SWIFT_UNAVAILABLE NS_ASSUME_NONNULL_BEGIN NS_ASSUME_NONNULL_END NS_REFINED_FOR_SWIFT NS_SWIFT_NAME NS_SWIFT_NOTHROW NS_DURING NS_HANDLER NS_ENDHANDLER NS_VALUERETURN NS_VOIDRETURN",literal:"false true FALSE TRUE nil YES NO NULL",built_in:"BOOL dispatch_once_t dispatch_queue_t dispatch_sync dispatch_async dispatch_once"},a=/[a-zA-Z@][a-zA-Z0-9_]*/,n="@interface @class @protocol @implementation";return{aliases:["mm","objc","obj-c"],k:r,l:a,i:"</",c:[t,e.CLCM,e.CBCM,e.CNM,e.QSM,{cN:"string",v:[{b:'@"',e:'"',i:"\\n",c:[e.BE]},{b:"'",e:"[^\\\\]'",i:"[^\\\\][^']"}]},{cN:"meta",b:"#",e:"$",c:[{cN:"meta-string",v:[{b:'"',e:'"'},{b:"<",e:">"}]}]},{cN:"class",b:"("+n.split(" ").join("|")+")\\b",e:"({|$)",eE:!0,k:n,l:a,c:[e.UTM]},{b:"\\."+e.UIR,r:0}]}}),e.registerLanguage("perl",function(e){var t="getpwent getservent quotemeta msgrcv scalar kill dbmclose undef lc ma syswrite tr send umask sysopen shmwrite vec qx utime local oct semctl localtime readpipe do return format read sprintf dbmopen pop getpgrp not getpwnam rewinddir qqfileno qw endprotoent wait sethostent bless s|0 opendir continue each sleep endgrent shutdown dump chomp connect getsockname die socketpair close flock exists index shmgetsub for endpwent redo lstat msgctl setpgrp abs exit select print ref gethostbyaddr unshift fcntl syscall goto getnetbyaddr join gmtime symlink semget splice x|0 getpeername recv log setsockopt cos last reverse gethostbyname getgrnam study formline endhostent times chop length gethostent getnetent pack getprotoent getservbyname rand mkdir pos chmod y|0 substr endnetent printf next open msgsnd readdir use unlink getsockopt getpriority rindex wantarray hex system getservbyport endservent int chr untie rmdir prototype tell listen fork shmread ucfirst setprotoent else sysseek link getgrgid shmctl waitpid unpack getnetbyname reset chdir grep split require caller lcfirst until warn while values shift telldir getpwuid my getprotobynumber delete and sort uc defined srand accept package seekdir getprotobyname semop our rename seek if q|0 chroot sysread setpwent no crypt getc chown sqrt write setnetent setpriority foreach tie sin msgget map stat getlogin unless elsif truncate exec keys glob tied closedirioctl socket readlink eval xor readline binmode setservent eof ord bind alarm pipe atan2 getgrent exp time push setgrent gt lt or ne m|0 break given say state when",r={cN:"subst",b:"[$@]\\{",e:"\\}",k:t},a={b:"->{",e:"}"},n={v:[{b:/\$\d/},{b:/[\$%@](\^\w\b|#\w+(::\w+)*|{\w+}|\w+(::\w*)*)/},{b:/[\$%@][^\s\w{]/,r:0}]},i=[e.BE,r,n],s=[n,e.HCM,e.C("^\\=\\w","\\=cut",{eW:!0}),a,{cN:"string",c:i,v:[{b:"q[qwxr]?\\s*\\(",e:"\\)",r:5},{b:"q[qwxr]?\\s*\\[",e:"\\]",r:5},{b:"q[qwxr]?\\s*\\{",e:"\\}",r:5},{b:"q[qwxr]?\\s*\\|",e:"\\|",r:5},{b:"q[qwxr]?\\s*\\<",e:"\\>",r:5},{b:"qw\\s+q",e:"q",r:5},{b:"'",e:"'",c:[e.BE]},{b:'"',e:'"'},{b:"`",e:"`",c:[e.BE]},{b:"{\\w+}",c:[],r:0},{b:"-?\\w+\\s*\\=\\>",c:[],r:0}]},{cN:"number",b:"(\\b0[0-7_]+)|(\\b0x[0-9a-fA-F_]+)|(\\b[1-9][0-9_]*(\\.[0-9_]+)?)|[0_]\\b",r:0},{b:"(\\/\\/|"+e.RSR+"|\\b(split|return|print|reverse|grep)\\b)\\s*",k:"split return print reverse grep",r:0,c:[e.HCM,{cN:"regexp",b:"(s|tr|y)/(\\\\.|[^/])*/(\\\\.|[^/])*/[a-z]*",r:10},{cN:"regexp",b:"(m|qr)?/",e:"/[a-z]*",c:[e.BE],r:0}]},{cN:"function",bK:"sub",e:"(\\s*\\(.*?\\))?[;{]",eE:!0,r:5,c:[e.TM]},{b:"-\\w\\b",r:0},{b:"^__DATA__$",e:"^__END__$",sL:"mojolicious",c:[{b:"^@@.*",e:"$",cN:"comment"}]}];return r.c=s,a.c=s,{aliases:["pl","pm"],l:/[\w\.]+/,k:t,c:s}}),e.registerLanguage("php",function(e){var t={b:"\\$+[a-zA-Z_-ÿ][a-zA-Z0-9_-ÿ]*"},r={cN:"meta",b:/<\?(php)?|\?>/},a={cN:"string",c:[e.BE,r],v:[{b:'b"',e:'"'},{b:"b'",e:"'"},e.inherit(e.ASM,{i:null}),e.inherit(e.QSM,{i:null})]},n={v:[e.BNM,e.CNM]};return{aliases:["php3","php4","php5","php6"],cI:!0,k:"and include_once list abstract global private echo interface as static endswitch array null if endwhile or const for endforeach self var while isset public protected exit foreach throw elseif include __FILE__ empty require_once do xor return parent clone use __CLASS__ __LINE__ else break print eval new catch __METHOD__ case exception default die require __FUNCTION__ enddeclare final try switch continue endfor endif declare unset true false trait goto instanceof insteadof __DIR__ __NAMESPACE__ yield finally",c:[e.HCM,e.C("//","$",{c:[r]}),e.C("/\\*","\\*/",{c:[{cN:"doctag",b:"@[A-Za-z]+"}]}),e.C("__halt_compiler.+?;",!1,{eW:!0,k:"__halt_compiler",l:e.UIR}),{cN:"string",b:/<<<['"]?\w+['"]?$/,e:/^\w+;?$/,c:[e.BE,{cN:"subst",v:[{b:/\$\w+/},{b:/\{\$/,e:/\}/}]}]},r,{cN:"keyword",b:/\$this\b/},t,{b:/(::|->)+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/},{cN:"function",bK:"function",e:/[;{]/,eE:!0,i:"\\$|\\[|%",c:[e.UTM,{cN:"params",b:"\\(",e:"\\)",c:["self",t,e.CBCM,a,n]}]},{cN:"class",bK:"class interface",e:"{",eE:!0,i:/[:\(\$"]/,c:[{bK:"extends implements"},e.UTM]},{bK:"namespace",e:";",i:/[\.']/,c:[e.UTM]},{bK:"use",e:";",c:[e.UTM]},{b:"=>"},a,n]}}),e.registerLanguage("python",function(e){var t={cN:"meta",b:/^(>>>|\.\.\.) /},r={cN:"string",c:[e.BE],v:[{b:/(u|b)?r?'''/,e:/'''/,c:[t],r:10},{b:/(u|b)?r?"""/,e:/"""/,c:[t],r:10},{b:/(u|r|ur)'/,e:/'/,r:10},{b:/(u|r|ur)"/,e:/"/,r:10},{b:/(b|br)'/,e:/'/},{b:/(b|br)"/,e:/"/},e.ASM,e.QSM]},a={cN:"number",r:0,v:[{b:e.BNR+"[lLjJ]?"},{b:"\\b(0o[0-7]+)[lLjJ]?"},{b:e.CNR+"[lLjJ]?"}]},n={cN:"params",b:/\(/,e:/\)/,c:["self",t,a,r]};return{aliases:["py","gyp"],k:{keyword:"and elif is global as in if from raise for except finally print import pass return exec else break not with class assert yield try while continue del or def lambda async await nonlocal|10 None True False",built_in:"Ellipsis NotImplemented"},i:/(<\/|->|\?)/,c:[t,a,r,e.HCM,{v:[{cN:"function",bK:"def",r:10},{cN:"class",bK:"class"}],e:/:/,i:/[${=;\n,]/,c:[e.UTM,n,{b:/->/,eW:!0,k:"None"}]},{cN:"meta",b:/^[\t ]*@/,e:/$/},{b:/\b(print|exec)\(/}]}}),e.registerLanguage("ruby",function(e){var t="[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?",r={keyword:"and then defined module in return redo if BEGIN retry end for self when next until do begin unless END rescue else break undef not super class case require yield alias while ensure elsif or include attr_reader attr_writer attr_accessor",literal:"true false nil"},a={cN:"doctag",b:"@[A-Za-z]+"},n={b:"#<",e:">"},i=[e.C("#","$",{c:[a]}),e.C("^\\=begin","^\\=end",{c:[a],r:10}),e.C("^__END__","\\n$")],s={cN:"subst",b:"#\\{",e:"}",k:r},c={cN:"string",c:[e.BE,s],v:[{b:/'/,e:/'/},{b:/"/,e:/"/},{b:/`/,e:/`/},{b:"%[qQwWx]?\\(",e:"\\)"},{b:"%[qQwWx]?\\[",e:"\\]"},{b:"%[qQwWx]?{",e:"}"},{b:"%[qQwWx]?<",e:">"},{b:"%[qQwWx]?/",e:"/"},{b:"%[qQwWx]?%",e:"%"},{b:"%[qQwWx]?-",e:"-"},{b:"%[qQwWx]?\\|",e:"\\|"},{b:/\B\?(\\\d{1,3}|\\x[A-Fa-f0-9]{1,2}|\\u[A-Fa-f0-9]{4}|\\?\S)\b/}]},o={cN:"params",b:"\\(",e:"\\)",endsParent:!0,k:r},l=[c,n,{cN:"class",bK:"class module",e:"$|;",i:/=/,c:[e.inherit(e.TM,{b:"[A-Za-z_]\\w*(::\\w+)*(\\?|\\!)?"}),{b:"<\\s*",c:[{b:"("+e.IR+"::)?"+e.IR}]}].concat(i)},{cN:"function",bK:"def",e:"$|;",c:[e.inherit(e.TM,{b:t}),o].concat(i)},{b:e.IR+"::"},{cN:"symbol",b:e.UIR+"(\\!|\\?)?:",r:0},{cN:"symbol",b:":(?!\\s)",c:[c,{b:t}],r:0},{cN:"number",b:"(\\b0[0-7_]+)|(\\b0x[0-9a-fA-F_]+)|(\\b[1-9][0-9_]*(\\.[0-9_]+)?)|[0_]\\b",r:0},{b:"(\\$\\W)|((\\$|\\@\\@?)(\\w+))"},{cN:"params",b:/\|/,e:/\|/,k:r},{b:"("+e.RSR+")\\s*",c:[n,{cN:"regexp",c:[e.BE,s],i:/\n/,v:[{b:"/",e:"/[a-z]*"},{b:"%r{",

@@ -13,12 +13,13 @@
     font-size: 150%;
 }
 .step pre {
+  font-family: monospace;
   border-color: #cde;
-  background: #F0F0F0;
+  /*background: #F0F0F0;*/
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  font-size: 21px;
+  font-size: 14px;
   margin-top: 15px;
 }
 .step h1 {

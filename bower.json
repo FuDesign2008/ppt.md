@@ -16,12 +16,12 @@
     "tests"
   ],
   "dependencies": {
-    "impress-js": "impress.js#^0.6.0",
-    "marked": "^0.3.6",
-    "prism": "^1.5.1",
-    "deck.js": "^1.1.0"
   },
   "devDependencies": {
-    "jquery": "^3.1.0"
+    "jquery": "^3.1.0",
+    "highlight": "^9.6.0",
+    "impress-js": "impress.js#^0.6.0",
+    "marked": "^0.3.6",
+    "deck.js": "^1.1.0"
   }
 }
