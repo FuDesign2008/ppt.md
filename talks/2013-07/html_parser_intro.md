@@ -1,8 +1,8 @@
-#htmlParser.js介绍及实现原理
+# htmlParser.js介绍及实现原理
 
 =====
 
-##Contents
+## Contents
 1. htmlParser.js 介绍
 1. why htmlParser.js ?
 1. 规则及基本原理
@@ -10,13 +10,13 @@
 1. QA
 
 =====
-##htmlParser.js
+## htmlParser.js
 * htmlParse.js 是一个对html内容进行处理, 使得内容符合xhtml规范的引擎.
 通过配置规则, 可以使得内容符合特定xhtml规范子集.
 
 ![whole progress](./html_image/whole_progress.jpg)
 =====
-##Why htmlParser.js
+## Why htmlParser.js
 * 云笔记的内容是以html富文本格式存储的
 <pre>
     html
@@ -26,7 +26,7 @@
           |....
 </pre>
 =====
-##Why htmlParser.js
+## Why htmlParser.js
 * 内容未系统过滤
 <pre><code class="language-markup">
     普通网页
@@ -44,21 +44,21 @@
     ...
 </code></pre>
 =====
-##Why htmlParser.js
+## Why htmlParser.js
 * 不合理的内容影响编辑器对内容处理和用户的编辑体验
 
 ![absolute.png](html_image/absolute.png)
 
 =====
-#过滤HTML!
+# 过滤HTML!
 =====
-#tag, style, class, attribute
+# tag, style, class, attribute
 =====
-#???过滤HTML???
+# ???过滤HTML???
 =====
-#规则
+# 规则
 =====
-##规则: tag
+## 规则: tag
 
 * 移除
 <pre>
@@ -73,7 +73,7 @@
     div ---- 重命名 ---> p
 </pre>
 =====
-##Q: 如何实现?
+## Q: 如何实现?
 <pre><code class="language-javascript">
     var html = "&lt;div&gt;&lt;/div&gt;",
         result;
@@ -93,7 +93,7 @@
 
 </code></pre>
 =====
-##规则: style
+## 规则: style
 * 移除
 * 保留
 * 重命名
@@ -107,7 +107,7 @@
     style="font-weight: bold; font-family: 宋体;"
 </code></pre>
 =====
-##Q: 如何实现?
+## Q: 如何实现?
 <pre><code class="language-javascript">
     var html = '&lt;div style="font-size: 100px; font-weight: bold; mso-font-family: 宋体;" &gt;' +
         '&lt;/div&gt;',
@@ -121,7 +121,7 @@
     result = '&lt;p style="font-weight: bold; font-family: 宋体;" &gt;&lt;/p&gt;'
 </code></pre>
 =====
-##Tricks
+## Tricks
 1. only inline style
     * element.style.cssName
     * NOT jQuery(element, cssName)
@@ -130,7 +130,7 @@
     * cssText = IE ? element.style.cssText : element.getAttribute('style')
     * 正则匹配
 =====
-##规则: class
+## 规则: class
 * 移除
 * 保留
 * 重命名
@@ -144,7 +144,7 @@
     class="ynote-todo-container ynote-todo-hover"
 </code></pre>
 =====
-##Q: 如何实现?
+## Q: 如何实现?
 <pre><code class="language-javascript">
     var html = '&lt;div class="float-right ynote-todo-div ynote-todo-hover" &gt;&lt/div&gt'
         result;
@@ -156,7 +156,7 @@
     result === '&lt;div class="ynote-todo-container ynote-todo-hover" &gt;&lt;/div&gt;';
 </code></pre>
 =====
-##规则: attribute
+## 规则: attribute
 * 移除
 * 保留
 * 重命名
@@ -170,7 +170,7 @@
     href="http://www.youdao.com/" data-id="123"
 </code></pre>
 =====
-##Q: 如何实现?
+## Q: 如何实现?
 <pre><code class="language-javascript">
     var html = '&lt;div hello="world" href="http://www.youdao.com/" id="123" &gt;&lt;/div&gt;',
         result;
@@ -182,30 +182,30 @@
     result === '&lt;div href="http://www.youdao.com/" data-id="123" &gt;&lt;/div&gt;'
 </code></pre>
 =====
-##总结
+## 总结
 1. html -> DOM tree
 1. handle tagName
 1. handle style
 1. handle class
 1. handle other attributes
 =====
-#N多节点呢?
+# N多节点呢?
 =====
-#递归
+# 递归
 =====
-##递归
+## 递归
 
 ![digui.png](html_image/digui.png)
 =====
-##htmlParser.js
+## htmlParser.js
 * [test page](http://fuyg.youdao.com/youdao/htmlParser/trunk/test/qunit_test_debug.html?filter=parser%2Fparse)
 * [svn ->  https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/)
 * 基于JSToolKit core + web
     * [JSToolKit 介绍](./jstoolkit_intro.html)
 =====
-#QA
+# QA
 =====
-#THANKS
+# THANKS
 
 
 
