@@ -10,7 +10,7 @@
     * `<input/>` / `<textarea/>`
     * `contenteditable` + `document.execCommand()`
     * `contenteditable` + `editor.execCommand()`
-    * Google Docs
+    * Google Doc / Word
 1. `contenteditable` + `document.execCommand()`
     * 实现原理
     * 优缺点
@@ -24,7 +24,7 @@
 1. BulbEditor的设计
     * 基本架构
     * 详细解释
-1. BulbEditor的优缺点
+    * 优缺点
 1. 未来
 
 ## 云笔记编辑器产品形态介绍
@@ -52,6 +52,8 @@
 ### 示例
 iPhone/Android 早期版本
 
+* http://tech.hexun.com/2011-09-27/133789129.html
+
 ### 优缺点
 1. 优点
     * 实现简单, 成本低
@@ -60,8 +62,6 @@ iPhone/Android 早期版本
 1. 缺点
     * 功能有限
     * 用户体验差
-
-
 
 
 ## `contenteditable` + `document.execCommand()`
@@ -147,18 +147,29 @@ iPhone/Android 早期版本
 
 ## Google Docs
 
+### 原理
+* 不依赖 `contenteditable`
+* 排版引擎(Layout Engine)
 
+
+## 小结
+
+### 优缺点
 
 ## 前期调研
 
-### 业界产品
-
-* [etherpad-lite](https://github.com/ether/etherpad-lite)
-    - [wikipedia - Etherpad](https://en.wikipedia.org/wiki/Etherpad)
+* [Etherpad](https://en.wikipedia.org/wiki/Etherpad)
+    - [etherpad-lite](https://github.com/ether/etherpad-lite)
 * [quip](https://quip.com/)
+* 有道云协作协同表格
 
+## BulbEditor 基本设计
 
-## BulbEditor的优缺点
+### 基本架构
+
+### 详细架构
+
+### 优缺点
 1. 优点
     * 数据更易处理
     * 扩展性强
