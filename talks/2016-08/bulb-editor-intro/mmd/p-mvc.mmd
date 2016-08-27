@@ -1,0 +1,14 @@
+graph LR
+
+c((Command))
+p((Paragraph))
+pv((ParagraphView))
+
+c -->|修改数据|p
+p -->|更新视图| pv
+pv -->|操作抽象| c
+
+
+style pv fill:#fcf,stroke:#333;
+style c  fill:#ffc,stroke:#333;
+style p  stroke:#333;

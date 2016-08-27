@@ -15,8 +15,7 @@
     "test",
     "tests"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "jquery": "^3.1.0",
     "highlight": "^9.6.0",

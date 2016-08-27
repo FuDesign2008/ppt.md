@@ -1,0 +1,39 @@
+graph LR
+
+
+do("do()")
+undo("undo()")
+redo("redo()")
+c(Command)
+
+c --- do
+c --- undo
+c --- redo
+
+cdo{"c.do()"}
+undos(Undo Stack)
+redos(Redo Stack)
+cundo{"c.undo()"}
+credo{"c.redo()"}
+
+cdo --> |push| undos
+undos -->|pop| cundo
+cundo -->|push| redos
+redos -->|pop| credo
+credo -->|push| undos
+
+
+
+style c  fill:#ffc,stroke:#333;
+style cdo  fill:#ffc,stroke:#333;
+style cundo  fill:#ffc,stroke:#333;
+style credo  fill:#ffc,stroke:#333;
+
+style undos  stroke:#333;
+style redos  stroke:#333;
+
+style do  stroke:none,fill:none;
+style undo  stroke:none,fill:none;
+style redo  stroke:none,fill:none;
+
+

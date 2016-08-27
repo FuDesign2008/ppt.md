@@ -1,0 +1,26 @@
+
+graph LR
+
+Bulb(RichText Bulb)
+rB(RichChar B)
+ru(RichChar u)
+rl(RichChar l)
+rb(RichChar b)
+
+Bulb --- rB
+Bulb --- ru
+Bulb --- rl
+Bulb --- rb
+
+ru --- u(u)
+ru --- uStyles(styles)
+uStyles --- uUnderline(strike : true)
+uStyles --- uColor(color : #FF0000)
+uStyles --- uBackcolor(backcolor : #FFFF00)
+
+
+classDef RichChar fill:#fcf,stroke:#333;
+class rb,rl,rB RichChar;
+
+style ru fill:#f9f,stroke:#333;
+style Bulb fill:#FAC08F,stroke:#333;

@@ -1,0 +1,21 @@
+graph LR
+
+c((Command))
+ns((NoteSelection))
+p((Note))
+pv((NoteView))
+
+c -->|修改数据|p
+p -->|更新视图| pv
+pv -->|操作抽象| c
+
+c -.->|计算NoteRange| ns
+ns -.->|获取NoteRange| c
+pv -.->|选区变化| ns
+ns -.->|通知绘制NoteRange| pv
+
+
+style pv fill:#fcf,stroke:#333;
+style c  fill:#ffc,stroke:#333;
+style p  stroke:#333;
+style ns  fill:#cff, stroke:#333;

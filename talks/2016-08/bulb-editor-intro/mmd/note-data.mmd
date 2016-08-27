@@ -1,0 +1,35 @@
+graph BT
+
+
+subgraph 数据 - Note
+    Block1
+    Block2
+    Block3
+    BlockM
+    Note
+    Note --- Block1
+    Note --- Block2
+    Note --- Block3
+    Note --- BlockM
+    NoteRange/NoteSelection
+end
+
+subgraph 视图 - NoteView
+    BlockView1
+    BlockView2
+    BlockView3
+    BlockViewM
+    NoteView
+    BlockView1 --- NoteView
+    BlockView2 --- NoteView
+    BlockView3 --- NoteView
+    BlockViewM --- NoteView
+end
+
+Block1 -.- BlockView1
+Block2 -.- BlockView2
+Block3 -.- BlockView3
+BlockM -.- BlockViewM
+NoteRange/NoteSelection -.- NoteView
+
+style NoteRange/NoteSelection  fill:#f9f,stroke:#333;

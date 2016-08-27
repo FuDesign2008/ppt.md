@@ -1,0 +1,23 @@
+
+graph LR
+
+
+p(Paragraph)
+rt(RichText)
+bs(blockStyles)
+h1((HTML))
+h2((HTML))
+pv((ParagraphView))
+
+p --- rt
+p --- bs
+rt -.-> h1
+bs -.-> h2
+h1 --- pv
+h2 --- pv
+
+style h1 fill:#fcf,stroke:#333;
+style h2 fill:#fcf,stroke:#333;
+style pv fill:#fcf,stroke:#333;
+
+

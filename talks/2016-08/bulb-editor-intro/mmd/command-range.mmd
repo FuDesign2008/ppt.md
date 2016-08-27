@@ -1,0 +1,20 @@
+
+graph LR
+
+in(NoteRange/BlockRange)
+b(Note/Block)
+t(CRUD type)
+c((Command))
+out(NoteRange/BlockRange)
+
+in --> c
+b --> c
+t --> c
+c --> out
+
+style c  fill:#ffc,stroke:#333;
+style in  fill:#cff, stroke:#333;
+style out  fill:#cff, stroke:#333;
+
+style t  stroke:#333;
+style b  stroke:#333;

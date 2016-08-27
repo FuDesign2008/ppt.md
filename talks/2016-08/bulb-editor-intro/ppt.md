@@ -1,215 +1,420 @@
-# htmlParser.js介绍及实现原理
+
+<p style="font-size: 24px;">第三代编辑器的进化之路<p>
+<p>&nbsp;</p>
+<h2 style="text-align:center;"> BulbEditor的设计&协同</h2>
+<p>&nbsp;</p>
+<p style="text-align: right; font-size: 24px;">傅云贵&蒋建宾<p>
 
 =====
 
-## Contents
-1. htmlParser.js 介绍
-1. why htmlParser.js ?
-1. 规则及基本原理
-1. N多节点
-1. QA
+# 基本设计
+<p>&nbsp;</p>
+<p style="text-align: center; font-size: 24px;">傅云贵(fuyg)<p>
 
 =====
-## htmlParser.js
-* htmlParse.js 是一个对html内容进行处理, 使得内容符合xhtml规范的引擎.
-通过配置规则, 可以使得内容符合特定xhtml规范子集.
 
-![whole progress](./images/whole_progress.jpg)
-=====
-## Why htmlParser.js
-* 云笔记的内容是以html富文本格式存储的
-<pre>
-    html
-     |-- head
-     |-- body  -> body 里面的内容即为笔记的内容
-          |-- xxx ...
-          |....
-</pre>
-=====
-## Why htmlParser.js
-* 内容未系统过滤
-<pre><code class="language-markup">
-    普通网页
-
-    &lt;div style="float:right"&gt;xxx...&lt;/div&gt;    &lt;= 影响布局
-    &lt;div class="right"&gt;xxxx...&lt;/div&gt;         &lt;= 影响布局
-    &lt;img width=100 height=200 /&gt;              &lt;= 影响布局
-    &lt;object&gt;...&lt;/object&gt;                     &lt;= 不想要
-
-    MS Office粘贴
-
-    &lt;p style='margin-left:21.0pt;
-    mso-char-indent-count:0;           <= mso-
-    mso-list:l2 level1 lfo4;           <= mso-
-    ...
-</code></pre>
-=====
-## Why htmlParser.js
-* 不合理的内容影响编辑器对内容处理和用户的编辑体验
-
-![absolute.png](./images/absolute.png)
+# 协同编辑
+<p>&nbsp;</p>
+<p style="text-align: center; font-size: 24px;">蒋建宾(jiangjb)<p>
 
 =====
-# 过滤HTML!
+
+<h2 style="text-align:center;"> BulbEditor基本设计</h2>
+<p>&nbsp;</p>
+<p style="text-align: center; font-size: 24px;">傅云贵(fuyg)<p>
+
 =====
-# tag, style, class, attribute
+
+# 云笔记 + 云协作
+
 =====
-# ???过滤HTML???
+
+## 跨平台
+
+* Web (WebKit 内核)
+* PC (CEF + Windows)
+* iOS (iPhone/iPad, UIWebView)
+* Android (CrossWalk)
+* Mac (WebView)
+
+
 =====
-# 规则
+
+* 富文本
+* 笔记来源
+    * 用户撰写(输入内容, 粘贴内容)
+    * [网页剪报](http://note.youdao.com/download.html#other)
+    * [第三方](http://note.youdao.com/open/) (Readonly)
+
 =====
-## 规则: tag
 
-* 移除
-<pre>
-    div ---- 移除 -----> ''
-</pre>
-* 保留
-<pre>
-    div ---- 保留 -----> div
-</pre>
-* 重命名
-<pre>
-    div ---- 重命名 ---> p
-</pre>
+### 富文本编辑
+
+1. `input` / `textarea`
+2. `contenteditable` + `doc.execCommand()`
+3. `contenteditable` + `editor.execCommand()`
+4. Google Doc / Word
+
+
 =====
-## Q: 如何实现?
-<pre><code class="language-javascript">
-    var html = "&lt;div&gt;&lt;/div&gt;",
-        result;
 
-    //移除div标签
-    result === '';
-</code></pre>
+## `input` / `textarea`
 
-<pre><code class="language-javascript">
-    //保留div标签
-    result === "&lt;div&gt;&lt;/div&gt;";
-</code></pre>
-
-<pre><code class="language-javascript">
-    //重命名div -> p
-    result === "&lt;p&gt;&lt;/p&gt;";
-
-</code></pre>
 =====
-## 规则: style
-* 移除
-* 保留
-* 重命名
-<pre><code class="language-html">
-    style="font-size: 100px; font-weight: bold; mso-font-family: 宋体;"
 
-    1. 移除fontSize
-    2. 保留font-weight
-    3. 重命名mso-font-family -> font-family
-
-    style="font-weight: bold; font-family: 宋体;"
-</code></pre>
+![android editor](./images/android_1.0.jpg)
 =====
-## Q: 如何实现?
-<pre><code class="language-javascript">
-    var html = '&lt;div style="font-size: 100px; font-weight: bold; mso-font-family: 宋体;" &gt;' +
-        '&lt;/div&gt;',
-        result;
 
-    //1. 移除font-size
-    //2. 保留font-weight
-    //3. 重命名mso-font-family -> font-family
-    //4. div --> p
+### 优点
 
-    result = '&lt;p style="font-weight: bold; font-family: 宋体;" &gt;&lt;/p&gt;'
-</code></pre>
+* 易实现, 成本低
+* 兼容性强
+
 =====
-## Tricks
-1. only inline style
-    * element.style.cssName
-    * NOT jQuery(element, cssName)
-1. 非标准cssName (e.g. mso-font-family)
-    * NOT element.style.name
-    * cssText = IE ? element.style.cssText : element.getAttribute('style')
-    * 正则匹配
+
+### 缺点
+* 功能有限
+* 用户体验差
+
 =====
-## 规则: class
-* 移除
-* 保留
-* 重命名
-<pre><code class="language-html">
-    class="float-right ynote-todo-div ynote-todo-hover"
 
-    1. 移除float-right
-    2. 保留ynote-todo-hover
-    3. 重命名ynote-todo-div -> ynote-todo-container
+## `contenteditable`
+## `+`
+## `doc.execCommand()`
 
-    class="ynote-todo-container ynote-todo-hover"
-</code></pre>
+
 =====
-## Q: 如何实现?
-<pre><code class="language-javascript">
-    var html = '&lt;div class="float-right ynote-todo-div ynote-todo-hover" &gt;&lt/div&gt'
-        result;
 
-    //1. 移除float-right
-    //2. 保留ynote-todo-hover
-    //3. 重命名ynote-todo-div -> ynote-todo-container
+## [小伙伴们惊呆了!](http://www.cnblogs.com/lhb25/p/html5-wysisyg-inline-editor.html)
+## [10行JavaScript](http://www.cnblogs.com/lhb25/p/html5-wysisyg-inline-editor.html)
+## [实现文本编辑器](http://www.cnblogs.com/lhb25/p/html5-wysisyg-inline-editor.html)
 
-    result === '&lt;div class="ynote-todo-container ynote-todo-hover" &gt;&lt;/div&gt;';
-</code></pre>
 =====
-## 规则: attribute
-* 移除
-* 保留
-* 重命名
-<pre><code class="language-html">
-    hello="world" href="http://www.youdao.com/" id="123"
-
-    1. 移除hello
-    2. 保留href
-    3. 重命名id -> data-id
-
-    href="http://www.youdao.com/" data-id="123"
-</code></pre>
+* [tinyEditor](http://www.scriptiny.com/2010/02/javascript-wysiwyg-editor/)
+    * [源代码](https://github.com/jessegreathouse/TinyEditor/blob/master/tinyeditor.js) 214 行, 8.8KB
+* [jHtmlArea](http://pietschsoft.com/demo/jhtmlarea/)
+    * [源代码](http://jhtmlarea.codeplex.com/SourceControl/latest#jHtmlArea/Nuget/Package/Content/Scripts/jHtmlArea-0.8.js) 462 行 (依赖jQuery)
+* [NicEdit](http://nicedit.com/)
+    * [源代码](https://github.com/danishkhan/NicEdit/blob/master/nicEdit.js) 2341 行
 =====
-## Q: 如何实现?
-<pre><code class="language-javascript">
-    var html = '&lt;div hello="world" href="http://www.youdao.com/" id="123" &gt;&lt;/div&gt;',
-        result;
 
-    //1. 移除hello
-    //2. 保留href
-    //3. 重命名id -> data-id
+### 优点
+* 易实现, 成本低
+* 性能好
 
-    result === '&lt;div href="http://www.youdao.com/" data-id="123" &gt;&lt;/div&gt;'
-</code></pre>
 =====
-## 总结
-1. html -> DOM tree
-1. handle tagName
-1. handle style
-1. handle class
-1. handle other attributes
+
+# 缺点
+
 =====
-# N多节点呢?
+
+## 功能受限
+<p style="height: 20px; overflow: hidden;">&nbsp;</p>
+<p style='text-align:center; font-size: 28px;'>`execCommand('fontsize', null, value)`</p>
+<p style="height: 20px; overflow: hidden;">&nbsp;</p>
+<p style='text-align:center; font-size: 36px;'>`value: 1 ~ 7`</p>
+
 =====
-# 递归
+## 兼容性
+
+doc.execCommand('bold')
+
+```xml
+
+<p>Here's to |the crazy| ones</p>
+
+<!-- Chrome/FireFox  -->
+<p>Here's to <b>the crazy</b> ones</p>
+
+<!-- IE -->
+<p>Here's to <strong>the crazy</strong> ones</p>
+
+```
+
 =====
-## 递归
+## 不可控
 
-![digui.png](./images/digui.png)
+`doc.execCommand()`
+
+
 =====
-## htmlParser.js
-* [test page](http://fuyg.youdao.com/youdao/htmlParser/trunk/test/qunit_test_debug.html?filter=parser%2Fparse)
-* [svn ->  https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/](https://dev.corp.youdao.com/svn/outfox/products/YNote/JSToolKit/htmlParser/)
-* 基于JSToolKit core + web
-    * [JSToolKit 介绍](./jstoolkit_intro.html)
+
+## contenteditable
+## +
+<h2>
+<span style="text-decoration: line-through; color: #F66;">doc</span>.execCommand()
+</h2>
+
 =====
-# QA
+
+## contenteditable
+## +
+<h2>
+<span style="color: green; font-size: 150%;">editor</span>.execCommand()
+</h2>
+
 =====
-# THANKS
+
+1. CKEditor
+1. TinyMCE
+1. UEditor
+1. KindEditor
+
+=====
+
+### 优点
+* 可控
+* 扩展性强
+
+=====
+
+### 缺点
+* 较难实现, 开发成本较高
 
 
+=====
+
+1. `input` / `textarea`
+2. `contenteditable` + `doc.execCommand()`
+3. `contenteditable` + `editor.execCommand()`
 
 
+=====
+
+### 特点
+* 数据层/视图层 (HTML)
+* 依赖原生光标(Selection/Range)
+* 依赖contentditable
+* 依赖浏览器排版
+
+=====
+
+## Google Docs
+
+=====
+
+[Google Drive Blog: Whats different about the new Google Docs?](https://drive.googleblog.com/2010/05/whats-different-about-new-google-docs.html)
+
+=====
+
+* 数据视图分离
+* 自定义光标(Selection/Range)
+* 不依赖 `contenteditable`
+* 排版引擎(Layout Engine)
+
+=====
+
+### 优点
+* 可控性更强
+* 扩展性强
+* 功能更丰富
+
+=====
+
+### 缺点
+
+* 复杂, 不易实现
+* 开发成本高
+
+=====
 
 
+![evo.jpg](./images/evo.jpg)
 
+=====
+
+### 第二代编辑器的问题
+
+* `doc.execCommand()` 不可控
+* HTML格式复杂
+* 难于支持非contenteditable内容
+
+
+=====
+
+### 期望
+
+* 解决第二代编辑器的问题
+* 为编辑而生
+* 强大的扩展性
+    - 丰富的功能
+    - 协同编辑
+    - 分页
+
+=====
+
+### 前期调研
+
+* Google Docs
+* [Etherpad](https://en.wikipedia.org/wiki/Etherpad)
+    - [etherpad-lite](https://github.com/ether/etherpad-lite)
+* [Quip](https://quip.com/)
+
+=====
+
+## [Quip](https://quip.com/)
+
+=====
+
+## 协同表格
+
+<p style="text-align: center; font-size: 24px;">王跃(wangyue)<p>
+
+=====
+
+## BulbEditor架构
+
+![note-data](./mmd/note-data.mmd.png)
+
+<div style="text-align:center;background-color: #CCC; color: #333; border: 1px solid #333; font-size: 32px; padding: 10px 0;">XML 存储</div>
+
+
+=====
+
+## 数据抽象
+
+![block-class](./mmd/block-class.mmd.png)
+
+=====
+
+## Paragraph
+
+=====
+
+## Paragraph - 存储层
+
+![paragraph](./mmd/paragraph.mmd.png)
+
+=====
+
+<h2 style="text-decoration:line-through;font-weight: normal;">B<span style="color:red;background-color:yellow">u</span>lb</h2>
+
+```xml
+<para>
+    <text>Bulb</text>               <!-- 内容 -->
+    <inline-styles>                 <!-- inline styles -->
+        <strike>
+            <from>0</from>
+            <to>4</to>
+            <value>true</value>
+        </strike>
+        <color>
+            <from>1</from>
+            <to>2</to>
+            <value>#FF0000</value>
+        </color>
+        <back-color>
+            <from>1</from>
+            <to>2</to>
+            <value>#FFFF00</value>
+        </back-color>
+    </inline-styles>
+    <styles>                        <!-- block styles -->
+        <align>center</align>
+    </styles>
+</para>
+
+```
+
+=====
+
+## Paragraph - 数据层
+
+![paragraph-rich-text](./mmd/paragraph-rich-text.mmd.png)
+
+=====
+
+<h2 style="text-decoration:line-through;font-weight: normal;">B<span style="color:red;background-color:yellow">u</span>lb</h2>
+
+![rich-text-bulb](./mmd/rich-text-bulb.mmd.png)
+
+=====
+## ParagraphRange
+
+=====
+
+## Paragraph - 视图层
+
+![paragraph-view](./mmd/p-v.mmd.png)
+
+=====
+
+<h2 style="text-decoration:line-through;font-weight: normal;">B<span style="color:red;background-color:yellow">u</span>lb</h2>
+
+```xml
+<div class="block-view paragraph-view"> <!-- wrapper -->
+    <div class="para-text" style="text-align: center;"> <!-- block styles -->
+        <!-- rich text START -->
+        <span style="text-decoration:line-through">
+            B
+        </span>
+        <span style="color:#FF0000;background-color:#FFFF00;text-decoration:line-through">
+            u
+        </span>
+        <span style="text-decoration:line-through">
+            lb
+        </span>
+        <!-- rich text END -->
+    </div>
+</div>
+
+```
+
+=====
+
+## MVC
+
+![paragraph-mvc](./mmd/p-mvc.mmd.png)
+
+=====
+
+## MVC
+![note-mvc](./mmd/note-mvc.mmd.png)
+
+=====
+## Command 计算Range
+
+![command-range](./mmd/command-range.mmd.png)
+
+=====
+
+## Command Undo/Redo
+![command-undo](./mmd/command-undo.mmd.png)
+
+=====
+
+### Command Undo/Redo
+
+Gif 动画
+
+=====
+
+### 第二代编辑器的问题
+
+* `doc.execCommand()` 不可控
+* HTML格式复杂
+* 难于支持非contenteditable内容
+
+=====
+
+### 优点
+
+* 可控
+* 扩展性强
+* 数据更易处理
+
+=====
+
+### 缺点
+
+* 实现复杂/开发成本高
+* 排版引擎缺失, 依赖html的排版
+* 性能下降
+
+=====
+
+![evo.jpg](./images/evo.jpg)
+
+=====
+
+<h1 style="font-family: monospace;">THANK YOU</h1>

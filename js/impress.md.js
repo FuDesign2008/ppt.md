@@ -61,13 +61,19 @@
             contents = pptHtml(contents);
             window.console.log(contents);
             $('#impress').html(contents);
-            // initialize ppt
-            impress().init();
+
             if (window.hljs) {
                 $('pre', document.body).each(function (index, pre) {
                     window.hljs.highlightBlock(pre);
                 });
             }
+
+            $('img', document.body).each(function (index, img) {
+                $(img.parentNode).addClass('img-wrapper');
+            });
+
+            // initialize ppt
+            impress().init();
         }, 'text');
     });
 })();

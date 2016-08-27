@@ -1,4 +1,4 @@
-# 富文本编辑器的进化之路 - BulbEditor的设计
+# 富文本编辑器的进化之路 - 第三代编辑器的设计
 
 
 
@@ -8,10 +8,10 @@
 1. 产品形态
 1. 富文本编辑器的架构, 普遍形式
     * `<input/>` / `<textarea/>`
-    * `contenteditable` + `document.execCommand()`
+    * `contenteditable` + `doc.execCommand()`
     * `contenteditable` + `editor.execCommand()`
     * Google Doc / Word
-1. `contenteditable` + `document.execCommand()`
+1. `contenteditable` + `doc.execCommand()`
     * 实现原理
     * 优缺点
 1. `contenteditable` + `editor.execCommand()`
@@ -64,10 +64,10 @@ iPhone/Android 早期版本
     * 用户体验差
 
 
-## `contenteditable` + `document.execCommand()`
+## `contenteditable` + `doc.execCommand()`
 
 ### 原理
-设置编辑容器(HTMLElement)的 `contenteditable`属性, 然后使用 `document.execCommand()` 修改html数据
+设置编辑容器(HTMLElement)的 `contenteditable`属性, 然后使用 `doc.execCommand()` 修改html数据
 
 ### 示例
 
@@ -101,11 +101,11 @@ iPhone/Android 早期版本
     * 性能好
 1. 缺点
     * 功能受限
-        - `document.execCommand('fontsize', null, 1-7)` 限制, https://developer.mozilla.org/en/docs/Web/API/Document/execCommand
+        - `doc.execCommand('fontsize', null, 1-7)` 限制, https://developer.mozilla.org/en/docs/Web/API/doc/execCommand
     * 兼容性
-        - `document.execCommand('bold')` 加粗,
+        - `doc.execCommand('bold')` 加粗,
     * 不可控
-        - 浏览器 `document.execCommand()` 存在bug
+        - 浏览器 `doc.execCommand()` 存在bug
 
 #### 兼容性示例
 ```xml
@@ -126,7 +126,7 @@ iPhone/Android 早期版本
 
 ### 原理
 
-设置编辑容器(HTMLElement)的 `contenteditable`属性, 使用JavaScript修改DOM的方式模拟`document.execCommand()`
+设置编辑容器(HTMLElement)的 `contenteditable`属性, 使用JavaScript修改DOM的方式模拟`doc.execCommand()`
 
 ### 示例
 
@@ -176,7 +176,7 @@ iPhone/Android 早期版本
         - 内嵌App, 比如Table
         - 协同编辑
     * 可控
-        - 丢弃`document.execCommand()`
+        - 丢弃`doc.execCommand()`
         - 显示时字体优化
 1. 缺点
     * 复杂/开发成本高

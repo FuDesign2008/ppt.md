@@ -1,0 +1,25 @@
+
+graph LR
+
+
+p(Paragraph)
+bs(blockStyles)
+align(align : center)
+rt(RichText)
+rc(RichChar 1)
+rc2(RichChar 2)
+rcN(RichChar N)
+is(inline-styles)
+t(text)
+
+
+p --- bs
+bs --- align
+p --- rt
+is -.-> rt
+t -.-> rt
+rt --- rc
+rt --- rc2
+rt --- rcN
+
+style rt fill:#f9f,stroke:#333;

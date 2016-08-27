@@ -1,0 +1,24 @@
+
+.step {
+    font-family: 'Microsoft YaHei',STXihei;
+}
+
+a, a:hover, a:active, a:focus, a:visited {
+    background: none;
+    text-shadow: none;
+    border-bottom: 1px dashed #000;
+    border-radius: 0;
+}
+
+h2 {
+    text-align: center;
+}
+
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.img-wrapper {
+    text-align: center;
+}
