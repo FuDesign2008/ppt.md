@@ -25,7 +25,9 @@
 
 =====
 
-# 云笔记 + 云协作
+# 云笔记
+# 云协作
+## docs
 
 =====
 
@@ -193,10 +195,11 @@ doc.execCommand('bold')
 
 =====
 
-[Google Drive Blog: Whats different about the new Google Docs?](https://drive.googleblog.com/2010/05/whats-different-about-new-google-docs.html)
+## [What's different about the new Google Docs?](https://drive.googleblog.com/2010/05/whats-different-about-new-google-docs.html)
 
 =====
 
+### Google Docs
 * 数据视图分离
 * 自定义光标(Selection/Range)
 * 不依赖 `contenteditable`
