@@ -29,25 +29,30 @@
 # 云协作
 ## docs
 
+<p class="hint-details">介绍编辑器支持的产品</p>
 =====
 
 ## 跨平台
 
 * Web (WebKit 内核)
 * PC (CEF + Windows)
+* Mac (WebView)
 * iOS (iPhone/iPad, UIWebView)
 * Android (CrossWalk)
-* Mac (WebView)
 
+<p class="hint-details">介绍各个端, 影响采用前端相关技术开发编辑器</p>
 
 =====
 
+## 笔记
+
 * 富文本
 * 笔记来源
-    * 用户撰写(输入内容, 粘贴内容)
+    * 编辑器产生(用户输入内容, 粘贴内容)
     * [网页剪报](http://note.youdao.com/download.html#other)
     * [第三方](http://note.youdao.com/open/) (Readonly)
 
+<p class="hint-details">富文本 -> 富文本编辑器, 网页剪报 -> 需要较全面支持html</p>
 =====
 
 ### 富文本编辑
@@ -62,15 +67,22 @@
 
 ## `input` / `textarea`
 
+<p class="hint-details">原理-> 通过JavaScript操作目标HTMLElement的`innerText`修改文本内容</p>
+
 =====
 
 ![android editor](./images/android_1.0.jpg)
+
+<p class="hint-details">iPhone/Android 早期版本</p>
+
 =====
 
 ### 优点
 
 * 易实现, 成本低
 * 兼容性强
+
+<p class="hint-details">成本低->代码量少, 兼容性强 -> 不使用contenteditale 属性</p>
 
 =====
 
@@ -84,6 +96,27 @@
 ## `+`
 ## `doc.execCommand()`
 
+<p class="hint-details">原理:设置编辑容器(HTMLElement)的 `contenteditable`属性, 然后使用 `doc.execCommand()` 修改html数据</p>
+
+=====
+
+# contenteditable
+
+<p class="hint-details">使得内容可编辑, 演示</p>
+
+=====
+
+## doc.execCommand()
+
+
+<p class="hint-details">修改/删除/插入内容</p>
+
+=====
+
+## Selection/Range
+
+
+<p class="hint-details">Range描述Dom树的范围, Selection渲染range</p>
 
 =====
 
@@ -91,13 +124,15 @@
 ## [10行JavaScript](http://www.cnblogs.com/lhb25/p/html5-wysisyg-inline-editor.html)
 ## [实现文本编辑器](http://www.cnblogs.com/lhb25/p/html5-wysisyg-inline-editor.html)
 
+<p class="hint-details">进入链接，分析如何实现</p>
+
 =====
 * [tinyEditor](http://www.scriptiny.com/2010/02/javascript-wysiwyg-editor/)
-    * [源代码](https://github.com/jessegreathouse/TinyEditor/blob/master/tinyeditor.js) 214 行, 8.8KB
+    * [源代码](https://github.com/jessegreathouse/TinyEditor/blob/master/tinyeditor.js) 214 行, 9KB
 * [jHtmlArea](http://pietschsoft.com/demo/jhtmlarea/)
-    * [源代码](http://jhtmlarea.codeplex.com/SourceControl/latest#jHtmlArea/Nuget/Package/Content/Scripts/jHtmlArea-0.8.js) 462 行 (依赖jQuery)
+    * [源代码](http://jhtmlarea.codeplex.com/SourceControl/latest#jHtmlArea/Nuget/Package/Content/Scripts/jHtmlArea-0.8.js) 462 行 (依赖jQuery), 11KB
 * [NicEdit](http://nicedit.com/)
-    * [源代码](https://github.com/danishkhan/NicEdit/blob/master/nicEdit.js) 2341 行
+    * [源代码](https://github.com/danishkhan/NicEdit/blob/master/nicEdit.js) 2341 行, 30KB
 =====
 
 ### 优点
@@ -136,8 +171,9 @@ doc.execCommand('bold')
 =====
 ## 不可控
 
-`doc.execCommand()`
+`doc.execCommand()` 黑盒
 
+<p class="hint-details">w3c 定义, 浏览器厂商实现也不一样, 也存在bug</p>
 
 =====
 
@@ -155,12 +191,13 @@ doc.execCommand('bold')
 <span style="color: green; font-size: 150%;">editor</span>.execCommand()
 </h2>
 
+<p class="hint-details">原理: 设置编辑容器(HTMLElement)的 `contenteditable`属性, 使用JavaScript修改DOM的方式模拟`doc.execCommand()`</p>
 =====
 
-1. CKEditor
-1. TinyMCE
-1. UEditor
-1. KindEditor
+1. [CKEditor](http://ckeditor.com/) 519KB
+1. [TinyMCE](https://www.tinymce.com/) (依赖jQuery) 385KB
+1. [UEditor](http://ueditor.baidu.com/website/) 383KB
+1. [KindEditor](http://kindeditor.org/) 186KB
 
 =====
 
@@ -193,6 +230,9 @@ doc.execCommand('bold')
 
 ## Google Docs
 
+<p class="hint-details">原理: 接管一切, 如不依赖`contenteditable`, 有自己的排版引擎</p>
+
+
 =====
 
 ## [What's different about the new Google Docs?](https://drive.googleblog.com/2010/05/whats-different-about-new-google-docs.html)
@@ -200,7 +240,6 @@ doc.execCommand('bold')
 =====
 
 ### Google Docs
-* 数据视图分离
 * 自定义光标(Selection/Range)
 * 不依赖 `contenteditable`
 * 排版引擎(Layout Engine)
@@ -208,6 +247,7 @@ doc.execCommand('bold')
 =====
 
 ### 优点
+* 数据视图分离
 * 可控性更强
 * 扩展性强
 * 功能更丰富
@@ -222,14 +262,14 @@ doc.execCommand('bold')
 =====
 
 
-![evo.jpg](./images/evo.jpg)
+![evo-2.jpg](./images/evo-2.jpg)
 
 =====
 
 ### 第二代编辑器的问题
 
 * `doc.execCommand()` 不可控
-* HTML格式复杂
+* HTML灵活, 格式丰富
 * 难于支持非contenteditable内容
 
 
@@ -365,9 +405,17 @@ doc.execCommand('bold')
 
 =====
 
+# Command
+
+=====
+
 ## MVC
 
 ![paragraph-mvc](./mmd/p-mvc.mmd.png)
+
+=====
+
+![block-list](./mmd/block-list.mmd.png)
 
 =====
 
@@ -395,28 +443,36 @@ Gif 动画
 ### 第二代编辑器的问题
 
 * `doc.execCommand()` 不可控
-* HTML格式复杂
+* HTML灵活, 格式丰富
 * 难于支持非contenteditable内容
 
 =====
 
 ### 优点
 
+* 数据视图分离
 * 可控
 * 扩展性强
 * 数据更易处理
+
+
+<p class="hint-details">
+可控 -> 丢弃 document.execCommand(), 显示时字体优化
+扩展性强 -> 内嵌mini app (如table), 协同编辑
+
+</p>
 
 =====
 
 ### 缺点
 
 * 实现复杂/开发成本高
-* 排版引擎缺失, 依赖html的排版
+* 排版引擎缺失
 * 性能下降
 
 =====
 
-![evo.jpg](./images/evo.jpg)
+![evo-3.jpg](./images/evo-3.jpg)
 
 =====
 

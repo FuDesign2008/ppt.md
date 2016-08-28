@@ -72,6 +72,8 @@
                 $(img.parentNode).addClass('img-wrapper');
             });
 
+            $('.hint-details', document.body).hide();
+
             // initialize ppt
             impress().init();
         }, 'text');
