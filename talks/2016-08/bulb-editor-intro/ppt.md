@@ -25,6 +25,12 @@
 
 =====
 
+## * 产品背景
+## * 四类实现
+## * 架构设计
+
+=====
+
 # 云笔记
 # 云协作
 ## docs
@@ -34,7 +40,7 @@
 
 ## 跨平台
 
-* Web (WebKit 内核)
+* Web (WebKit 内核桌面浏览器)
 * PC (CEF + Windows)
 * Mac (WebView)
 * iOS (iPhone/iPad, UIWebView)
@@ -55,7 +61,11 @@
 <p class="hint-details">富文本 -> 富文本编辑器, 网页剪报 -> 需要较全面支持html</p>
 =====
 
-### 富文本编辑
+# [网页剪报](http://note.youdao.com/download.html#other)
+
+=====
+
+### 富文本编辑器
 
 1. `input` / `textarea`
 2. `contenteditable` + `doc.execCommand()`
@@ -73,7 +83,7 @@
 
 ![android editor](./images/android_1.0.jpg)
 
-<p class="hint-details">iPhone/Android 早期版本</p>
+<p class="hint-details">iPhone/Android 1.0 版本</p>
 
 =====
 
@@ -194,6 +204,12 @@ doc.execCommand('bold')
 <p class="hint-details">原理: 设置编辑容器(HTMLElement)的 `contenteditable`属性, 使用JavaScript修改DOM的方式模拟`doc.execCommand()`</p>
 =====
 
+<h2>
+<span style="color: green; font-size: 150%;">editor</span>.execCommand()
+</h2>
+
+=====
+
 1. [CKEditor](http://ckeditor.com/) 519KB
 1. [TinyMCE](https://www.tinymce.com/) (依赖jQuery) 385KB
 1. [UEditor](http://ueditor.baidu.com/website/) 383KB
@@ -208,7 +224,8 @@ doc.execCommand('bold')
 =====
 
 ### 缺点
-* 较难实现, 开发成本较高
+* 较难实现
+* 开发成本较高
 
 
 =====
@@ -256,8 +273,9 @@ doc.execCommand('bold')
 
 ### 缺点
 
-* 复杂, 不易实现
+* 复杂, 难实现
 * 开发成本高
+* 性能下降
 
 =====
 
@@ -270,7 +288,7 @@ doc.execCommand('bold')
 
 * `doc.execCommand()` 不可控
 * HTML灵活, 格式丰富
-* 难于支持非contenteditable内容
+* 难于内嵌非contenteditable内容
 
 
 =====
@@ -450,10 +468,10 @@ Gif 动画
 
 ### 优点
 
-* 数据视图分离
+* 数据/视图分离
+* 数据易处理
 * 可控
 * 扩展性强
-* 数据更易处理
 
 
 <p class="hint-details">
@@ -466,7 +484,8 @@ Gif 动画
 
 ### 缺点
 
-* 实现复杂/开发成本高
+* 复杂, 不易实现
+* 开发成本高
 * 排版引擎缺失
 * 性能下降
 
