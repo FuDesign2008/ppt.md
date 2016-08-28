@@ -1,0 +1,49 @@
+
+graph TD
+
+
+subgraph 视图层
+    pv(ParagraphView)
+    liv(ListItemView)
+    imgv(ImageView)
+    av(AttachmentView)
+    tv(TableView)
+    hrv(HrView)
+    uv(UnknownView)
+    nv(NoteView)
+
+    nv --- pv
+    nv --- liv
+    nv --- imgv
+    nv --- av
+    nv --- tv
+    nv --- hrv
+    nv --- uv
+end
+
+subgraph 数据层
+    p(Paragraph)
+    li(ListItem)
+    img(Image)
+    a(Attachment)
+    t(Table)
+    hr(Hr)
+    u(Unknown)
+    n(Note)
+
+    p --- n
+    li --- n
+    img --- n
+    a --- n
+    t --- n
+    hr --- n
+    u --- n
+end
+
+pv -.- p
+liv -.- li
+imgv -.- img
+av -.- a
+tv -.- t
+hrv -.- hr
+uv -.- u
