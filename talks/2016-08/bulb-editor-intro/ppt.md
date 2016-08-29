@@ -40,11 +40,7 @@
 
 ## 跨平台
 
-* Web (WebKit 内核桌面浏览器)
-* PC (CEF + Windows)
-* Mac (WebView)
-* iOS (iPhone/iPad, UIWebView)
-* Android (CrossWalk)
+![editor-list](./mmd/editor-list.mmd.png)
 
 <p class="hint-details">介绍各个端, 影响采用前端相关技术开发编辑器</p>
 
@@ -342,7 +338,7 @@ doc.execCommand('bold')
 
 =====
 
-## Paragraph - 存储层
+## Paragraph - XML存储层
 
 ![paragraph](./mmd/paragraph.mmd.png)
 
