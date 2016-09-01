@@ -76,6 +76,14 @@
 
             // initialize ppt
             impress().init();
+
+            $('.step', document.body).each(function (index, step) {
+                var hasList = $(step).find('>ul, >ol').length > 0;
+
+                if (hasList) {
+                    $(step).addClass('list-wrapper');
+                }
+            });
         }, 'text');
     });
 })();

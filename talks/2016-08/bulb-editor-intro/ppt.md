@@ -1,9 +1,14 @@
 
-<p style="font-size: 24px;">第三代编辑器的进化之路<p>
+# 屏幕 1024 * 600
+
+=====
+
+
+<p style="font-size: 32px;">第三代编辑器的进化之路<p>
 <p>&nbsp;</p>
 <h2 style="text-align:center;"> BulbEditor的设计&协同</h2>
 <p>&nbsp;</p>
-<p style="text-align: right; font-size: 24px;">傅云贵&蒋建宾<p>
+<p style="text-align: right; font-size: 32px;">傅云贵&蒋建宾<p>
 
 =====
 
@@ -68,7 +73,7 @@
 
 =====
 
-### 富文本编辑器
+## 富文本编辑器
 
 1. `input` / `textarea`
 2. `contenteditable` + `doc.execCommand()`
@@ -90,7 +95,7 @@
 
 =====
 
-### 优点
+## 优点
 
 * 易实现, 成本低
 * 兼容性强
@@ -99,7 +104,7 @@
 
 =====
 
-### 缺点
+## 缺点
 * 功能有限
 * 用户体验差
 
@@ -148,7 +153,7 @@
     * [源代码](https://github.com/danishkhan/NicEdit/blob/master/nicEdit.js) 2341 行, 30KB
 =====
 
-### 优点
+## 优点
 * 易实现, 成本低
 * 性能好
 
@@ -158,7 +163,7 @@
 
 =====
 
-依赖contenteditable
+## 依赖contenteditable
 
 =====
 
@@ -188,7 +193,8 @@ doc.execCommand('bold')
 =====
 ## 不可控
 
-`doc.execCommand()` 黑盒
+<p style="height: 20px; overflow: hidden;">&nbsp;</p>
+<p style='text-align:center; font-size: 48px;'>`doc.execCommand()` 黑盒</p>
 
 <p class="hint-details">w3c 定义, 浏览器厂商实现也不一样, 也存在bug</p>
 
@@ -197,7 +203,7 @@ doc.execCommand('bold')
 ## contenteditable
 ## +
 <h2>
-<span style="text-decoration: line-through; color: #F66;">doc</span>.execCommand()
+<span style="text-decoration: line-through; color: #F66;font-size: 150%;">doc</span>.execCommand()
 </h2>
 
 =====
@@ -224,13 +230,13 @@ doc.execCommand('bold')
 
 =====
 
-### 优点
+## 优点
 * 可控
 * 扩展性强
 
 =====
 
-### 缺点
+## 缺点
 * 依赖contenteditable
 * 较难实现
 * 开发成本较高
@@ -245,7 +251,7 @@ doc.execCommand('bold')
 
 =====
 
-### 特点
+## 特点
 * 依赖contentditable
 * 依赖原生光标(Selection/Range)
 * 依赖浏览器排版
@@ -264,7 +270,7 @@ doc.execCommand('bold')
 
 =====
 
-### Google Docs
+## Google Docs
 
 * 不依赖 `contenteditable`
 * 自实现光标(Selection/Range)
@@ -272,7 +278,7 @@ doc.execCommand('bold')
 
 =====
 
-### 优点
+## 优点
 
 * 可控性更强
 * 扩展性强
@@ -281,7 +287,7 @@ doc.execCommand('bold')
 
 =====
 
-### 缺点
+## 缺点
 
 * 复杂, 难实现
 * 开发成本高
@@ -294,7 +300,10 @@ doc.execCommand('bold')
 
 =====
 
-### 第二代编辑器的问题
+## 第二代编辑器的问题
+
+1. 普遍缺点
+1. 产品相关问题
 
 * HTML灵活, 格式丰富
 * `doc.execCommand()` 不可控
@@ -304,7 +313,40 @@ doc.execCommand('bold')
 
 =====
 
-### 期望
+## 1. 普遍问题
+
+* 依赖contenteditable
+* 功能受限
+* `doc.execCommand()` 不可控
+* 依赖原生光标(Selection/Range)
+* 数据层/视图层 (HTML)
+
+
+=====
+
+## 2. 相关相关问题
+
+=====
+
+## 网页剪报
+
+<p style="text-align: center; font-size: 24px;">HTML灵活, 格式丰富<p>
+
+=====
+
+## 非contenteditable内容
+
+=====
+
+![todo](./images/todo.jpg)
+
+=====
+
+![handwrite](./images/handwrite.jpeg)
+
+=====
+
+## 期望
 
 * 为编辑而生
 * 解决第二代编辑器的问题
@@ -315,7 +357,7 @@ doc.execCommand('bold')
 
 =====
 
-### 前期调研
+## 前期调研
 
 * Google Docs
 * [Etherpad](https://en.wikipedia.org/wiki/Etherpad)
@@ -324,7 +366,7 @@ doc.execCommand('bold')
 
 =====
 
-## [Quip](https://quip.com/)
+# [Quip](https://quip.com/)
 
 =====
 
@@ -370,16 +412,8 @@ doc.execCommand('bold')
             <to>4</to>
             <value>true</value>
         </strike>
-        <color>
-            <from>1</from>
-            <to>2</to>
-            <value>#FF0000</value>
-        </color>
-        <back-color>
-            <from>1</from>
-            <to>2</to>
-            <value>#FFFF00</value>
-        </back-color>
+        <color> <from>1</from> <to>2</to> <value>#FF0000</value> </color>
+        <back-color> <from>1</from> <to>2</to> <value>#FFFF00</value> </back-color>
     </inline-styles>
     <styles>                        <!-- block styles -->
         <align>center</align>
@@ -463,7 +497,7 @@ doc.execCommand('bold')
 
 =====
 
-### 第二代编辑器的问题
+## 第二代编辑器的问题
 
 * HTML灵活, 格式丰富
 * `doc.execCommand()` 不可控
@@ -473,7 +507,7 @@ doc.execCommand('bold')
 
 =====
 
-### 优点
+## 优点
 
 * 数据/视图分离
 * 数据易处理
@@ -489,7 +523,7 @@ doc.execCommand('bold')
 
 =====
 
-### 缺点
+## 缺点
 
 * 无法兼容部分旧笔记
 * 部分依赖contenteditable
@@ -505,3 +539,7 @@ doc.execCommand('bold')
 =====
 
 <h1 style="font-family: monospace;">THANK YOU</h1>
+
+=====
+
+# 恢复屏幕
