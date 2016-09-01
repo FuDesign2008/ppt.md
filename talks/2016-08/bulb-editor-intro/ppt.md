@@ -31,9 +31,12 @@
 
 =====
 
+# 产品背景
+
+=====
+
 # 云笔记
 # 云协作
-## docs
 
 <p class="hint-details">介绍编辑器支持的产品</p>
 =====
@@ -58,6 +61,10 @@
 =====
 
 # [网页剪报](http://note.youdao.com/download.html#other)
+
+=====
+
+# 四类实现
 
 =====
 
@@ -151,6 +158,10 @@
 
 =====
 
+依赖contenteditable
+
+=====
+
 ## 功能受限
 <p style="height: 20px; overflow: hidden;">&nbsp;</p>
 <p style='text-align:center; font-size: 28px;'>`execCommand('fontsize', null, value)`</p>
@@ -220,6 +231,7 @@ doc.execCommand('bold')
 =====
 
 ### 缺点
+* 依赖contenteditable
 * 较难实现
 * 开发成本较高
 
@@ -234,10 +246,10 @@ doc.execCommand('bold')
 =====
 
 ### 特点
-* 数据层/视图层 (HTML)
-* 依赖原生光标(Selection/Range)
 * 依赖contentditable
+* 依赖原生光标(Selection/Range)
 * 依赖浏览器排版
+* 数据层/视图层 (HTML)
 
 =====
 
@@ -253,17 +265,19 @@ doc.execCommand('bold')
 =====
 
 ### Google Docs
-* 自定义光标(Selection/Range)
+
 * 不依赖 `contenteditable`
+* 自实现光标(Selection/Range)
 * 排版引擎(Layout Engine)
 
 =====
 
 ### 优点
-* 数据视图分离
+
 * 可控性更强
 * 扩展性强
 * 功能更丰富
+* 数据视图分离
 
 =====
 
@@ -282,17 +296,18 @@ doc.execCommand('bold')
 
 ### 第二代编辑器的问题
 
-* `doc.execCommand()` 不可控
 * HTML灵活, 格式丰富
-* 难于内嵌非contenteditable内容
+* `doc.execCommand()` 不可控
+* 依赖contenteditable
+    - 难于内嵌非contenteditable内容
 
 
 =====
 
 ### 期望
 
-* 解决第二代编辑器的问题
 * 为编辑而生
+* 解决第二代编辑器的问题
 * 强大的扩展性
     - 丰富的功能
     - 协同编辑
@@ -448,17 +463,13 @@ doc.execCommand('bold')
 
 =====
 
-### Command Undo/Redo
-
-Gif 动画
-
-=====
-
 ### 第二代编辑器的问题
 
-* `doc.execCommand()` 不可控
 * HTML灵活, 格式丰富
-* 难于支持非contenteditable内容
+* `doc.execCommand()` 不可控
+* 依赖contenteditable
+    - 难于内嵌非contenteditable内容
+
 
 =====
 
@@ -480,6 +491,8 @@ Gif 动画
 
 ### 缺点
 
+* 无法兼容部分旧笔记
+* 部分依赖contenteditable
 * 复杂, 不易实现
 * 开发成本高
 * 排版引擎缺失
