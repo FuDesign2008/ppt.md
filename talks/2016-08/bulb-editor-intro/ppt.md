@@ -316,7 +316,6 @@ doc.execCommand('bold')
 ## 1. 普遍问题
 
 * 依赖contenteditable
-* 功能受限
 * `doc.execCommand()` 不可控
 * 依赖原生光标(Selection/Range)
 * 数据层/视图层 (HTML)
@@ -324,7 +323,7 @@ doc.execCommand('bold')
 
 =====
 
-## 2. 相关相关问题
+## 2. 业务相关问题
 
 =====
 
@@ -502,9 +501,13 @@ doc.execCommand('bold')
 ## 第二代编辑器的问题
 
 * HTML灵活, 格式丰富
-* `doc.execCommand()` 不可控
 * 依赖contenteditable
     - 难于内嵌非contenteditable内容
+* `doc.execCommand()` 不可控
+* 依赖原生光标(Selection/Range)
+* 数据层/视图层 (HTML)
+
+
 
 
 =====
