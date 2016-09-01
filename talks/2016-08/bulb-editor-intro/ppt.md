@@ -476,14 +476,6 @@ doc.execCommand('bold')
 
 ![paragraph-mvc](./mmd/p-mvc.mmd.png)
 
-=====
-
-![block-list](./mmd/block-list.mmd.png)
-
-=====
-
-## MVC
-![note-mvc](./mmd/note-mvc.mmd.png)
 
 =====
 ## Command 计算Range
@@ -496,6 +488,16 @@ doc.execCommand('bold')
 ![command-undo](./mmd/command-undo.mmd.png)
 
 =====
+
+![block-list](./mmd/block-list.mmd.png)
+
+=====
+
+## MVC
+![note-mvc](./mmd/note-mvc.mmd.png)
+
+=====
+
 
 ## 第二代编辑器的问题
 
