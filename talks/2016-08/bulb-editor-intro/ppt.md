@@ -305,12 +305,6 @@ doc.execCommand('bold')
 1. 普遍缺点
 1. 产品相关问题
 
-* HTML灵活, 格式丰富
-* `doc.execCommand()` 不可控
-* 依赖contenteditable
-    - 难于内嵌非contenteditable内容
-
-
 =====
 
 ## 1. 普遍问题
@@ -341,7 +335,7 @@ doc.execCommand('bold')
 
 =====
 
-![handwrite](./images/handwrite.jpeg)
+![handwrite](./images/handwrite.png)
 
 =====
 
@@ -494,6 +488,10 @@ doc.execCommand('bold')
 
 ## MVC
 ![note-mvc](./mmd/note-mvc.mmd.png)
+
+=====
+
+![BulbEditor](./images/bulbeditor.png)
 
 =====
 
