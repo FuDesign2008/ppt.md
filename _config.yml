@@ -1,0 +1,8 @@
+title: ppt.md
+description: write ppt with markdown
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
