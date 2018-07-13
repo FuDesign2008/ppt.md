@@ -1,35 +1,43 @@
 graph BT
 
 
-subgraph 数据 - Note
+subgraph 数据层
     Block1
     Block2
     Block3
-    BlockM
+    BlockN
     Note
     Note --- Block1
     Note --- Block2
     Note --- Block3
-    Note --- BlockM
-    NoteRange/NoteSelection
+    Note --- BlockN
+    NoteSelection
+    NoteRange
+    NoteRange --- NoteSelection
+    BlockRange1 --- NoteRange
+    BlockRange2 --- NoteRange
+    BlockRange3 --- NoteRange
+    BlockRangeM --- NoteRange
 end
 
-subgraph 视图 - NoteView
+subgraph 视图层
     BlockView1
     BlockView2
     BlockView3
-    BlockViewM
+    BlockViewN
     NoteView
     BlockView1 --- NoteView
     BlockView2 --- NoteView
     BlockView3 --- NoteView
-    BlockViewM --- NoteView
+    BlockViewN --- NoteView
+    NoteSelectionView
 end
 
 Block1 -.- BlockView1
 Block2 -.- BlockView2
 Block3 -.- BlockView3
-BlockM -.- BlockViewM
-NoteRange/NoteSelection -.- NoteView
+BlockN -.- BlockViewN
+NoteSelection -.- NoteSelectionView
 
-style NoteRange/NoteSelection  fill:#f9f,stroke:#333;
+style NoteSelection  fill:#f9f,stroke:#333;
+style NoteSelectionView  fill:#f9f,stroke:#333;
