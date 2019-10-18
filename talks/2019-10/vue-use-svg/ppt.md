@@ -1,9 +1,74 @@
-# 屏幕 1024 \* 600
+# Vue 中使用 SVG
 
 =====
 
-<p style="font-size: 32px;">第三代编辑器的进化之路<p>
-<p>&nbsp;</p>
-<h2 style="text-align:center;"> BulbEditor的设计&协同</h2>
-<p>&nbsp;</p>
-<p style="text-align: right; font-size: 32px;">傅云贵&蒋建宾<p>
+## [file-loader](https://github.com/vuejs/vue-cli/blob/dev/packages/%40vue/cli-service/lib/config/base.js)
+
+-   默认
+-   https://github.com/vuejs/vue-cli/blob/dev/packages/%40vue/cli-service/lib/config/base.js
+
+=====
+
+```html
+<template>
+    <div>
+        <img :src="svgFile" />
+    </div>
+</template>
+
+<script>
+    import SvgIcon from './path/to/svg-icon-file.svg'
+
+    export default {
+        data() {
+            return {
+                svgFile: SvgIcon
+            }
+        }
+    }
+<script>
+
+```
+
+=====
+
+# [vue-svg-loader](https://github.com/visualfanatic/vue-svg-loader)
+
+### SVG 作为 Vue 组件使用
+
+=====
+
+```javascript
+// webpack 配置
+module: {
+    rules: [
+        {
+            test: /\.svg$/,
+            loader: 'vue-svg-loader',
+        },
+    ]
+}
+```
+
+=====
+
+```html
+<template>
+    <div>
+        <svg-icon class="svg-icon" />
+    </div>
+</template>
+
+<script>
+    import SvgIcon from './path/to/svg-icon-file.svg'
+
+    export default {
+        components: {
+            SvgIcon,
+        }
+    }
+<script>
+
+```
+
+=====
