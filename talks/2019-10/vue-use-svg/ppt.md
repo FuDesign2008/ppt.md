@@ -3,6 +3,7 @@
 =====
 
 ## 1. SVG 组件化
+
 ## 2. SVG 按钮化
 
 =====
@@ -120,7 +121,6 @@ declare module '*.svg' {
 
 ### `fill: #FF992C`
 
-
 =====
 
 ```html
@@ -148,20 +148,20 @@ declare module '*.svg' {
 
 ```scss
 .svg-camera {
-    $normal-color: #818998;
-    $hover-color: #374151;
-    $disable-color: #eef0f2;
-    path, g, rect {
-        fill: $normal-color;
+    path,
+    g {
+        fill: #818998;
     }
     &:hover {
-        path, g, rect {
-            fill: $hover-color;
+        path,
+        g {
+            fill: #374151;
         }
     }
     &.disabled {
-        path, g, rect {
-            fill: $disable-color;
+        path,
+        g {
+            fill: #eef0f2;
         }
     }
 }
@@ -172,8 +172,6 @@ declare module '*.svg' {
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="21px" height="21px" viewBox="0 0 21 21">
-    <title>ic_uploading</title>
-    <desc>Created with Sketch.</desc>
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g transform="translate(-524.000000, -610.000000)" fill="#33A3FF">
             <g id="mesg" transform="translate(367.000000, 131.000000)">
