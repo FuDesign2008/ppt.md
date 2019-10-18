@@ -142,27 +142,17 @@ declare module '*.svg' {
 .svg-camera {
     $normal-color: #818998;
     $hover-color: #374151;
-    $active-color: #374151;
     $disable-color: #eef0f2;
-
-    path,
-    g,
-    rect {
+    path, g, rect {
         fill: $normal-color;
     }
-
     &:hover {
-        path,
-        g,
-        rect {
+        path, g, rect {
             fill: $hover-color;
         }
     }
-
     &.disabled {
-        path,
-        g,
-        rect {
+        path, g, rect {
             fill: $disable-color;
         }
     }
@@ -173,36 +163,15 @@ declare module '*.svg' {
 
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
-<svg
-    width="21px"
-    height="21px"
-    viewBox="0 0 21 21"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
->
-    <!-- Generator: Sketch 56.3 (81716) - https://sketch.com -->
+<svg width="21px" height="21px" viewBox="0 0 21 21">
     <title>ic_uploading</title>
     <desc>Created with Sketch.</desc>
-    <g
-        id="4.-作业布置"
-        stroke="none"
-        stroke-width="1"
-        fill="none"
-        fill-rule="evenodd"
-    >
-        <g
-            id="4.1.1-作业布置_输入"
-            transform="translate(-524.000000, -610.000000)"
-            fill="#33A3FF"
-        >
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-524.000000, -610.000000)" fill="#33A3FF">
             <g id="mesg" transform="translate(367.000000, 131.000000)">
                 <g id="作业图片" transform="translate(0.000000, 440.000000)">
                     <g id="Bitmap" transform="translate(117.000000, 0.000000)">
-                        <g
-                            id="ic_uploading"
-                            transform="translate(40.000000, 40.000000)"
-                        >
+                        <g transform="translate(40.000000, 40.000000)">
                             <path
                                 d="M10,7.42104262 C11.6574911,7.42104262 12.9999749,8.74004002 12.9999749,10.3684422 C12.9999749,11.9967457 11.6574911,13.3157678 10,13.3157678 C8.34250893,13.3157678 7.00002515,11.9968445 7.00002515,10.3684422 C7.00002515,8.74004002 8.34250893,7.42104262 10,7.42104262 Z M10,14.789475 C12.4826155,14.789475 14.5,12.8073967 14.5,10.3684497 C14.5,7.92942854 12.4826155,5.94742433 10,5.94742433 C7.51751018,5.94742433 5.5,7.92942854 5.5,10.3684497 C5.5,12.8073967 7.51751018,14.789475 10,14.789475 Z M17.2824848,5.94742433 C18.2801127,5.94742433 19,6.24205559 19,7.22205164 L19,15.2240351 C19,16.1968914 18.2801127,17 17.2824848,17 L2.8071868,17 C1.81775662,17 1,16.1968914 1,15.2240351 L1,7.22205164 C1,6.24205559 1.81775662,5.94742433 2.8071868,5.94742433 L4.98254011,5.94742433 C5.28243449,5.94742433 5.59744179,5.43141199 5.69518533,5.1590893 L6.24996228,3.7368252 C6.3401368,3.4569675 6.70015591,3 7.00002515,3 L12.9999749,3 C13.2999447,3 13.6525959,3.4569675 13.7500377,3.7368252 L14.3949137,5.10011858 C14.4923304,5.37997628 14.8149319,5.94742433 15.1148262,5.94742433 L17.2824848,5.94742433 Z"
                             ></path>
