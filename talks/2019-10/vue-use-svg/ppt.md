@@ -84,7 +84,7 @@ module: {
 
 =====
 
-# [TypeScript & SVG](https://stackoverflow.com/questions/44717164/unable-to-import-svg-files-in-typescript)
+# [TypeScript](https://stackoverflow.com/questions/44717164/unable-to-import-svg-files-in-typescript)
 
 ```typescript
 declare module '*.svg' {
