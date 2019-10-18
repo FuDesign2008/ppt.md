@@ -2,6 +2,11 @@
 
 =====
 
+### 1. SVG 组件化
+### 2. SVG 按钮化
+
+=====
+
 ## [file-loader](https://github.com/vuejs/vue-cli/blob/dev/packages/%40vue/cli-service/lib/config/base.js)
 
 -   `vue-cli` 默认
