@@ -36,14 +36,19 @@
 
 =====
 
-1.  `npm i -D vue-svg-loader`
+1.  安装
 1.  修改 webpack 配置
-1.  引用 svg 文件
+1.  使用
 
 =====
 
+# `npm i -D vue-svg-loader`
+
+=====
+
+# 修改 webpack 配置
+
 ```javascript
-// webpack 配置
 module: {
     rules: [
         {
@@ -55,6 +60,8 @@ module: {
 ```
 
 =====
+
+# 使用
 
 ```html
 <template>
@@ -73,6 +80,17 @@ module: {
     }
 <script>
 
+```
+
+=====
+
+# [TypeScript & SVG](https://stackoverflow.com/questions/44717164/unable-to-import-svg-files-in-typescript)
+
+```typescript
+declare module '*.svg' {
+    const content: any
+    export default content
+}
 ```
 
 =====
