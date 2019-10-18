@@ -36,9 +36,9 @@
 
 =====
 
--   `npm i -D vue-svg-loader`
--   修改 webpack 配置
--   引用 svg 文件
+1.  `npm i -D vue-svg-loader`
+1.  修改 webpack 配置
+1.  引用 svg 文件
 
 =====
 
@@ -93,16 +93,7 @@ module: {
 
 =====
 
-# [css fill](https://css-tricks.com/almanac/properties/f/fill/)
-
-=====
-
-# CSS color value
-
--   Named colors — `orange`
--   Hex colors — `#FF9E2C`
--   RGB and RGBa colors — `rgb(255, 158, 44)` and `rgba(255, 158, 44, .5)`
--   HSL and HSLa colors — `hsl(32, 100%, 59%)` and `hsla(32, 100%, 59%, .5)`
+# [css - fill: #FF992C ](https://css-tricks.com/almanac/properties/f/fill/)
 
 =====
 
@@ -114,6 +105,16 @@ module: {
         />
     </div>
 </template>
+
+<script>
+    import SvgCamera from './path/to/svg-camera-file.svg'
+
+    export default {
+        components: {
+            SvgCamera,
+        }
+    }
+<script>
 
 ```
 
