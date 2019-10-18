@@ -42,11 +42,11 @@
 
 =====
 
-# `npm i -D vue-svg-loader`
+### `npm i -D vue-svg-loader`
 
 =====
 
-# 修改 webpack 配置
+### 修改 webpack 配置
 
 ```javascript
 module: {
@@ -61,7 +61,7 @@ module: {
 
 =====
 
-# 使用
+### 使用
 
 ```html
 <template>
