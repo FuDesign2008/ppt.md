@@ -111,7 +111,10 @@ declare module '*.svg' {
 
 =====
 
-# [css - fill: #FF992C ](https://css-tricks.com/almanac/properties/f/fill/)
+# CSS
+
+### `fill: #FF992C`
+
 
 =====
 
