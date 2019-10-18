@@ -109,6 +109,7 @@ declare module '*.svg' {
 
 -   `default`
 -   `hover`
+-   `active`
 -   `disabled`
 
 =====
