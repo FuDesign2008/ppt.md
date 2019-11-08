@@ -89,9 +89,11 @@
 
 =====
 
-## 4 好书推荐
+## 4. 好书推荐
 
-## <<原则>>
+=====
+
+![原则](https://img3.doubanio.com/view/subject/l/public/s29643861.jpg)
 
 =====
 
