@@ -93,7 +93,7 @@
 
 =====
 
-![原则](https://img3.doubanio.com/view/subject/l/public/s29643861.jpg)
+![原则](./images/s29643861.jpg)
 
 =====
 
