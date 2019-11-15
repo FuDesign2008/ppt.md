@@ -1,4 +1,4 @@
-# Gitlab/GitHub 上配置 ssh key
+## Gitlab/GitHub 上配置 ssh key
 
 =====
 
@@ -9,6 +9,8 @@
 1. 添加至 Gitlab/Github
     - macOS: `pbcopy < ~/.ssh/id_rsa.pub`
     - Gitlab/GitHub 中操作
+
+=====
 
 ## 多账户支持
 
