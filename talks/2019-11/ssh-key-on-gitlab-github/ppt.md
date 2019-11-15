@@ -5,9 +5,9 @@
 ## 一般步骤
 
 1. [生成 ssh key](https://help.github.com/en/enterprise/2.15/user/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-    - macOS: `ssh-keygen -t rsa -C "your.email@example.com" -b 4096`
+    - `ssh-keygen -t rsa -C "your.email@example.com" -b 4096`
 1. 添加至 Gitlab/Github
-    - macOS: `pbcopy < ~/.ssh/id_rsa.pub`
+    - `pbcopy < ~/.ssh/id_rsa.pub`
     - Gitlab/GitHub 中操作
 
 =====
@@ -26,7 +26,7 @@
 ### 支持
 
 -   生成多个 ssh key
--   配置 config
+-   配置 `~/.ssh/config`
 
 =====
 
@@ -77,7 +77,7 @@ git config user.email "jexchan@gmail.com"
 =====
 
 1. ssh 生成检查 ✅
-1. 多账户 ssh config 配置检查 ✅
+1. `~/.ssh/config` 配置检查 ✅
 1. `~/.gitconfig` 配置检查 ✅
 1. `hw-web` 工程配置 ⚠️
 
@@ -99,6 +99,7 @@ git config user.email "fuyg@xxx.com"
 ### 最佳实践
 
 -   正确配置 ssh
+    -   多账户
 -   自定义头像
 
 =====
