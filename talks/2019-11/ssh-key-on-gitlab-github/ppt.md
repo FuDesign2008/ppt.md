@@ -6,7 +6,9 @@
 
 1. [生成 ssh key](https://help.github.com/en/enterprise/2.15/user/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
     - macOS: `ssh-keygen -t rsa -C "your.email@example.com" -b 4096`
-1. # 添加至 Gitlab/Github - macOS: `pbcopy < ~/.ssh/id_rsa.pub` - Gitlab/GitHub 中操作
+1. 添加至 Gitlab/Github
+    - macOS: `pbcopy < ~/.ssh/id_rsa.pub`
+    - Gitlab/GitHub 中操作
 
 ## 多账户支持
 
@@ -45,7 +47,7 @@ Host github.com-jexchan
 
 =====
 
-### 已有的 repo
+### 已有 repo
 
 ```bash
 cd ~/path/to/repo
@@ -57,10 +59,6 @@ git config user.email "jexchan@gmail.com"
 =====
 
 ## 案例
-
-=====
-
-### 情况
 
 =====
 
@@ -84,7 +82,6 @@ git config user.email "jexchan@gmail.com"
 =====
 
 ```bash
-
 cd ~/path/to/hw-web
 git config user.name "fuyg"
 git config user.email "fuyg@xxx.com"
@@ -101,6 +98,8 @@ git config user.email "fuyg@xxx.com"
 
 -   正确配置 ssh
 -   自定义头像
+
+=====
 
 ## 参考
 
