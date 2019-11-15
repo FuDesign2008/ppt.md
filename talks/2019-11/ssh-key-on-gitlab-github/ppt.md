@@ -105,4 +105,4 @@ git config user.email "fuyg@xxx.com"
 
 -   [Generating a new SSH key and adding it to the ssh-agent](https://help.github.com/en/enterprise/2.15/user/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
 -   [Adding a new SSH key to your GitHub account](https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account)
--   [Multiple SSH Keys settings for different github account](https://gist.github.com/jexchan/2351996]
+-   [Multiple SSH Keys settings for different github account](https://gist.github.com/jexchan/2351996)
