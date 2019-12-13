@@ -67,10 +67,10 @@
 
 ### 其他手段保证 fix ts 的报错
 
-1. `npm run dev` 的 termimal log 中能够看到报错信息
-1. 开发时, 编辑器/IDE
-1. 代码 commit 时，会自动检查代码，若有错，无法提交代码
-1. `npm run build`
+-   ✅`npm run dev` 的 termimal log 中能够看到报错信息
+-   ✅ 开发时, 编辑器/IDE
+-   ✅ 代码 commit 时，会自动检查代码，若有错，无法提交代码
+-   ✅`npm run build`
 
 =====
 
