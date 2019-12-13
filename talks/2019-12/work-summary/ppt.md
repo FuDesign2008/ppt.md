@@ -12,28 +12,6 @@
 
 =====
 
-### 目前的思考
-
-```javascript
-/**
- *
- * ⚠️ 使用方法
- *
- * 1. mixin MathJaxMixin 的组件需要根据时机，调用 renderMathJaxAtNextTick() 方法
- *    - mounted
- *    - updated
- * 1. mixin MathJaxMixin 的组件在 beforeDestroy 时，需要调用 cancelMathJaxRender() 方法
- *
- * ⚠️ 使用技巧
- *
- * 1. 组件中 shouldRenderMathJaxBySelf = true, 可以精确控制组件自身的渲染。缺点是，当渲染处理非常多组件时，需要花费比较长的时间
- * 1. 在更大的DOM区域使用，以达到更好的性能。 但前提是: DOM 已经渲染完毕, 且不会动态新增 。 否则可能会出现新增的DOM没有被MathJax渲染的情况
- *
- */
-```
-
-=====
-
 ## `hw-web`工程中 引入 `views`
 
 =====
@@ -82,13 +60,17 @@
 ### 目的
 
 1.  [typescript - webpack-dev-server &amp; ts-loader not reloads when interface changed - Stack Overflow](https://stackoverflow.com/questions/53312320/webpack-dev-server-ts-loader-not-reloads-when-interface-changed)
-1.  有其他手段保证 fix ts 的报错
-    -   ✅`npm run dev` 的 log 信息中能够看到报错信息
-    -   ✅ 开发时, 编辑器/IDE
-    -   ✅ 代码 commit 时，会自动检查代码，若有错，无法提交代码
-    -   ✅`npm run build`
 1.  开发时浏览器页面 ts 不报错, 可以加快 ts 文件的编译/webpack reload 浏览器的速度，对开发者更友好
     -   ⚠️Webpack + TypeScript 开发模式编译太慢
+
+=====
+
+### 其他手段保证 fix ts 的报错
+
+1. `npm run dev` 的 termimal log 中能够看到报错信息
+1. 开发时, 编辑器/IDE
+1. 代码 commit 时，会自动检查代码，若有错，无法提交代码
+1. `npm run build`
 
 =====
 
