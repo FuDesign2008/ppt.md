@@ -2,7 +2,13 @@
 
 =====
 
-## bugfix `MathJax 的渲染与监听`
+1.  bugfix `MathJax 的渲染与监听`
+1.  `hw-web`工程中 引入 `views`
+1.  [`hw-web` 开发模式打包优化](https://gitlab.corp.youdao.com/homework/hw-web/merge_requests/739)
+
+=====
+
+## 1. bugfix `MathJax 的渲染与监听`
 
 =====
 
@@ -12,7 +18,7 @@
 
 =====
 
-## `hw-web`工程中 引入 `views`
+## 2. `hw-web`工程中 引入 `views`
 
 =====
 
@@ -44,7 +50,7 @@
 
 =====
 
-## [`hw-web` 开发模式打包优化](https://gitlab.corp.youdao.com/homework/hw-web/merge_requests/739)
+## 3. [`hw-web` 开发模式打包优化](https://gitlab.corp.youdao.com/homework/hw-web/merge_requests/739)
 
 =====
 
