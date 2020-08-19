@@ -24,7 +24,7 @@ Note: ir-web 是一个前端工程，对应 https://ir.youdao.com 的前端部�
 ### 切换域名时出现的问题
 
 1. 海外打开 https://ir.youdao.com 很慢
-1. 根据运维同事的建议，应该把 css/js 等静态资源部署到 CDN 上
+1. 根据运维同学的建议，应该把 css/js 等静态资源部署到 CDN 上
 
 ---
 
