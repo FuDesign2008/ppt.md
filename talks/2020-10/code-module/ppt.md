@@ -10,11 +10,11 @@
 
 ---
 
-### 来源
-
 ![The Pragmatic Programmer](./code-module/The_pragmatic_programmer.jpg)
 
-The Pragmatic Programmer (程序员修炼之道：从小工到专家)
+The Pragmatic Programmer
+
+(程序员修炼之道：从小工到专家)
 
 =====
 
@@ -25,8 +25,6 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 分而治之
 
 ---
-
-### 核心
 
 1. 分/Divide (模块划分) ⭐️
 1. 治/Conquer (功能实现)
@@ -53,7 +51,7 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ---
 
-### Vue 层面
+### Vue
 
 1. 页面(`page`)
 1. 界面(`view`)
@@ -62,7 +60,7 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ---
 
-### Javascript/Typescript 层面
+### JS/TS
 
 1. 库/框架 (`day.js`/`Vue`)
 1. 文件 (`*.js`/`*.ts`)
@@ -72,9 +70,11 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ---
 
-### CSS 层面
+### CSS
 
 SCSS / Less
+
+---
 
 以 SCSS 为例
 
