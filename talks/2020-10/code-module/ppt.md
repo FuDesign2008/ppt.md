@@ -4,11 +4,11 @@
 
 ## DRY
 
-=====
+---
 
 `Don't Repeat Yourself`
 
-=====
+---
 
 ### 来源
 
@@ -20,11 +20,11 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ## Divide and Conquer
 
-=====
+---
 
 分而治之
 
-=====
+---
 
 ### 核心
 
@@ -35,13 +35,15 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ## UI 层模块划分
 
-=====
+---
 
 ![UI](./code-module/WX20201030-153406@2x.png)
 
-=====
+---
 
 ### Start with a Pencil and Paper
+
+---
 
 ![prototype](./code-module/odot-drawing.png)
 
@@ -49,7 +51,7 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 
 ## 代码层模块划分
 
-=====
+---
 
 ### Vue 层面
 
@@ -58,7 +60,7 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 1. 组件(`Component`)
 1. Mixin (不推荐)
 
-=====
+---
 
 ### Javascript/Typescript 层面
 
@@ -68,7 +70,7 @@ The Pragmatic Programmer (程序员修炼之道：从小工到专家)
 1. 函数 ( `function` )
 1. 常量/变量
 
-=====
+---
 
 ### CSS 层面
 
